@@ -39,6 +39,8 @@ WSGI_APPLICATION = 'virtual_character.wsgi.application'
 """ ================= static and media files ================= """
 STATIC_ROOT = 'static_collected_files'
 STATIC_URL = '/static/'
+STATICFILES_DIRS = ( os.path.join(BASE_DIR, 'static_collected_files'), )
+#STATICFILES_DIRS = ( os.path.join('static_collected_files'), )
 
 
 """ ================= project packages and middleware ================= """
