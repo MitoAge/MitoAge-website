@@ -37,6 +37,7 @@ WSGI_APPLICATION = 'virtual_character.wsgi.application'
 
 
 """ ================= static and media files ================= """
+STATIC_ROOT = 'static_collected_files'
 STATIC_URL = '/static/'
 
 
