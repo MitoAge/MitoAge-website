@@ -1,0 +1,1 @@
+web: gunicorn virtual_character.wsgi
