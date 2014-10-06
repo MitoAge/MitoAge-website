@@ -1,0 +1,70 @@
+{% load staticfiles %}
+
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	
+	<title>{% block title %}Virtual character {% block subtitle%}|{% block head_title %}{% endblock %}{% endblock%}{% endblock%}</title>
+	<!-- <link href="{% static 'css/style.css' %}" type="text/css" rel="stylesheet" media="all"/>  -->
+	<!-- <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script> -->
+	<!-- <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script> -->
+
+	{% block head_additional%}{% block extra_head %}{% endblock %}{% endblock%}
+
+</head>
+
+<body>
+	{% block body %}
+
+	<header>
+
+		<div class="container">
+		{% block header %}
+
+			{# include "website/_navigation.html" #}
+
+		{% endblock %}
+		</div>
+
+	</header>
+
+	<div class="container full-page">
+
+		<div class="row">
+		{% block body_content %}
+			
+			
+			<div class="col-md-8">	
+			
+			{% block content %}
+				Please re-write the base.html template.
+			{% endblock %}
+
+			{% block additional_main_panel_sections %}	<!-- Possibility to add additional panels = main panel long -->
+			{% endblock %}
+			</div>					
+		
+			<div class="col-md-4">		<!-- Right side panel (where sort of widgets are displayed) -->
+			{% block right_panel%}
+				
+			{% endblock %}				<!-- End of right panel -->
+			</div>
+			
+			{% block additional_row_panels %}	<!-- Possibility to add additional panels = website long -->
+			{% endblock %}
+			
+		{% endblock %}					<!-- End of content -->
+		</div>
+		
+	</div>
+	{% endblock %}
+	
+	{% block extra_body %}
+    {% endblock %}
+</body>
+
+{% block end_of_file_stuff %}
+{% endblock%}
+	
+</html>
+

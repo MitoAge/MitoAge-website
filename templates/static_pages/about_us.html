@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block subtitle%} | About this website {% endblock%}
+
+{% block content %}
+<br />
+<p>
+	<strong>
+		<span style="font-family: 'times new roman', times; font-size: medium;">About this website</span>
+	</strong>
+</p>
+	<a href="{% url 'test_page' %}">Link to a test page</a>
+	<a href="/admin/">Link to admin</a>
+
+<br/>
+
+<p>
+	<span style="font-family: 'times new roman', times; font-size: medium;">
+Virtual Character is a project whose name urgently needs to be changed... at least that's what Bogdan will say when he sees it. 
+	</span>
+	<img src="{% static 'images/patrician.jpg' %}">
+	
+</p>
+{% endblock %}

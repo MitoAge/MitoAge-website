@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block subtitle%} | Server error{% endblock%}
+
+{% block content %}
+
+	<img src="{% static 'images/500-error-page.jpg' %}" title="Internal server error" width="100%" />
+
+
+{% endblock %}

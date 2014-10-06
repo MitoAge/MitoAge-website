@@ -8,7 +8,7 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     # Our custom made packages == virtual character
-    #url(r'', include('virtual_character.website.urls')),
+    url(r'', include('virtual_character.static_pages.urls')),
     #url(r'', include('virtual_character.debugging.urls')),
 
 

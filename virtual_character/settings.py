@@ -30,7 +30,7 @@ DEBUG = True if (os.environ['DEBUG'].lower())=='true' else False
 TEMPLATE_DEBUG = DEBUG
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['stony-hammer-staging.herokuapp.com', 'localhost', '127.0.0.1']
 
 ROOT_URLCONF = 'virtual_character.urls'
 WSGI_APPLICATION = 'virtual_character.wsgi.application'
@@ -51,6 +51,10 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Our packages:
+    'virtual_character',
+    'virtual_character.static_pages',
 
     # Admin:
     'suit',
