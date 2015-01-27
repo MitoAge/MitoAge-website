@@ -1,15 +1,15 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
-from virtual_character import settings
+from mitoage import settings
 
 urlpatterns = patterns('',
     # Examples:
-    # url(r'^$', 'virtual_character.views.home', name='home'),
+    # url(r'^$', 'mitoage.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
 
     # Our custom made packages == virtual character
-    url(r'', include('virtual_character.static_pages.urls')),
-    #url(r'', include('virtual_character.debugging.urls')),
+    url(r'', include('mitoage.static_pages.urls')),
+    #url(r'', include('mitoage.debugging.urls')),
 
 
     # admin

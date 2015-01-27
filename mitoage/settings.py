@@ -32,8 +32,8 @@ TEMPLATE_DEBUG = DEBUG
 
 ALLOWED_HOSTS = ['stony-hammer-staging.herokuapp.com', 'localhost', '127.0.0.1']
 
-ROOT_URLCONF = 'virtual_character.urls'
-WSGI_APPLICATION = 'virtual_character.wsgi.application'
+ROOT_URLCONF = 'mitoage.urls'
+WSGI_APPLICATION = 'mitoage.wsgi.application'
 
 
 """ ================= static and media files ================= """
@@ -53,8 +53,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     # Our packages:
-    'virtual_character',
-    'virtual_character.static_pages',
+    'mitoage',
+    'mitoage.static_pages',
 
     # Admin:
     'suit',
@@ -118,7 +118,7 @@ DATABASES['default'] = dj_database_url.config(default=os.environ['DATABASE_URL']
 """ ================= Admin - suit configuration ================= """
 SUIT_CONFIG = {
     # header
-    'ADMIN_NAME': "Virtual Character - the admin",
+    'ADMIN_NAME': "MitoAge - the admin",
     'HEADER_DATE_FORMAT': 'l, j. F Y',
     'HEADER_TIME_FORMAT': 'H:i',
 
@@ -144,65 +144,3 @@ SUIT_CONFIG = {
     # misc
     'LIST_PER_PAGE': 15
 }
-
-''' Below is the configuration from Trust me, I'm a biologist - needs to be adapted
-SUIT_CONFIG = {
-    # header
-    'ADMIN_NAME': "Trust me, I'm a biologist - the admin",
-    'HEADER_DATE_FORMAT': 'l, j. F Y',
-    'HEADER_TIME_FORMAT': 'H:i',
-
-    # forms
-    'SHOW_REQUIRED_ASTERISK': True,  # Default True
-    'CONFIRM_UNSAVED_CHANGES': True, # Default True
-
-    # menu
-    #'SEARCH_URL': '/admin/auth/user/',
-    'MENU_ICONS': {
-        'sites': 'icon-leaf',
-        'auth': 'icon-lock',
-    },
-    #'MENU_OPEN_FIRST_CHILD': False, # Default True
-    #'MENU_EXCLUDE': ('auth.group',),
-    'MENU': (
-        {'label': 'Back to website', 'icon':'icon-heart', 'url': '/'},
-        '-', 
-        {'app': 'sites', 'label': 'Sites & settings', 'icon':'icon-leaf', 'models': (
-            {'label':'Trust me websites', 'model':'site'}, 'website.faq', 'website.websitesuggestion'
-        )},
-        {'app': 'auth', 'label': 'Authentication', 'icon':'icon-lock', 'models': (
-            'auth.user', 'auth.group', 'avatar.avatar', 
-            'account.emailaddress', 'account.emailconfirmation',  
-            'socialaccount.socialapp', 'socialaccount.socialaccount', 'socialaccount.socialtoken', 
-            'openid.openidnonce', 'openid.openidstore'
-        )},
-        '-', 
-        
-        {'app': 'photologue', 'label': 'Pictures & galleries', 'icon':'icon-picture', 'models': (
-            'photologue.photo', 'photologue.gallery', 'photologue.photoeffect', 'photologue.photosize', 'photologue.watermark', 
-            'tagging.tag', 'tagging.taggeditem' 
-        )},
-        {'app': 'photologue_hack', 'label': 'Pictures - advanced', 'icon':'icon-camera', 'models': (
-            {'label':'Gallery upload', 'model':'photologue_hack.improvedgalleryupload'}, 
-            {'label':'Picture scores', 'model':'photologue_hack.photovotescore'}, 
-            {'label':'Picture metadata', 'model':'photologue_hack.photometadata'}, 
-            {'label':'Favorite pictures', 'model':'photologue_hack.userphotofavoriterelationship'}, 
-            {'label':'User votes', 'model':'photologue_hack.userphotovoterelationship'}, 
-        )},
-        
-        '-', 
-        {'app': 'publishing', 'label': 'Publishing system', 'icon':'icon-share'},
-        {'app': 'schedule', 'label': 'Scheduling', 'icon':'icon-calendar'},
-        {'app': 'djcelery', 'label': 'Celery', 'icon':'icon-tasks'},
-
-        '-', 
-        {'app':'debugging', 'label': 'Debug', 'icon':'icon-cog'},
-
-        # Custom app and model with permissions
-        #{'label': 'Secure', 'permissions': 'auth.add_user', 'models': [
-        #    {'label': 'custom-child', 'permissions': ('auth.add_user', 'auth.add_group')}
-        #]},
-    ),
-    # misc
-    'LIST_PER_PAGE': 15
-}'''
