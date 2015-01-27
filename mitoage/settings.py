@@ -30,7 +30,7 @@ DEBUG = True if (os.environ['DEBUG'].lower())=='true' else False
 TEMPLATE_DEBUG = DEBUG
 
 
-ALLOWED_HOSTS = ['stony-hammer-staging.herokuapp.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['mitoage.herokuapp.com', 'localhost', '127.0.0.1']
 
 ROOT_URLCONF = 'mitoage.urls'
 WSGI_APPLICATION = 'mitoage.wsgi.application'
