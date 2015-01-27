@@ -1,1 +1,1 @@
-web: gunicorn virtual_character.wsgi
+web: gunicorn mitoage.wsgi

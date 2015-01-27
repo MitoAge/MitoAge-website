@@ -1,7 +1,5 @@
 """ ================= General settings ================= """
-ADMINS = (
-    ('Robi Tacutu', 'robi.tacutu@gmail.com'), ('Bogdan Dinu', 'bogdan.dinu@gmail.com'),
-)
+ADMINS = ( ('Robi Tacutu', 'robi.tacutu@gmail.com'), )
 MANAGERS = ADMINS
 
 # Time zone and internationalization
@@ -26,11 +24,11 @@ SECRET_KEY = 'q1*s(h7_&c*50$4@ek5vr=a#$%*c5!p#(vkz3o#&g9iefh!#6t'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 """ ================= DEBUG mode? ================= """
-DEBUG = True if (os.environ['DEBUG'].lower())=='true' else False
+#DEBUG = True if (os.environ['DEBUG'].lower())=='true' else False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-
-ALLOWED_HOSTS = ['mitoage.herokuapp.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['mitoage.org', 'mitoage.info', 'mitoage.herokuapp.com', 'localhost', '127.0.0.1']
 
 ROOT_URLCONF = 'mitoage.urls'
 WSGI_APPLICATION = 'mitoage.wsgi.application'
