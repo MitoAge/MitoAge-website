@@ -9,7 +9,7 @@ urlpatterns = patterns('',
 
     # Our custom made packages == virtual character
     url(r'', include('mitoage.static_pages.urls')),
-    #url(r'', include('mitoage.debugging.urls')),
+    url(r'', include('mitoage.taxonomy.urls')),
 
 
     # admin

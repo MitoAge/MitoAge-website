@@ -1,0 +1,51 @@
+{% extends "admin/base_site.html" %}
+
+{% block breadcrumbs %}
+{% endblock %}
+
+{% block content %}
+    <div id="content-main">
+        <div class="module" >
+            <div class="alert alert-info" role="info">
+                <h4>AnAge lifespan data import</h4>
+	            <p><br/>This page allows you to import AnAge data (CSV format) into MitoAge.</p>
+				<p>Upload a comma seperated text file (CSV) below and submit. <br/>Following the upload, you will be able to review the data. </p>
+				<br/>
+                <h4>Data format</h4>
+				<p><br/>Data must be in a CSV format with 3 columns specifying the name of the species, its lifespan (in years) and the HAGR ID. The header of the columns should specifically be: "Species", "Lifespan" and "HAGRID". Lifespan will be specified in years. </p>
+			</div>
+
+            <div class="alert alert-success" role="success">
+                <h4>Upload file</h4>
+				<form id="import-uploadform" action="{% url 'admin:anage_csvimport' %}" method="post" enctype="multipart/form-data">
+					{% csrf_token %} 
+					<input type="file" name="anage_file" />
+					<button type="submit" class="button blue-button">Upload AnAge data</button>
+				</form>
+			</div>
+
+            <h3>Upload example</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+	                    <th>Species</th>
+	                    <th>Lifespan</th>
+	                    <th>HAGRID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+	                    <td>Phrynocephalus grumgrzimailoi</td>
+	                    <td>5</td>
+	                    <td>471</td>
+                    </tr>
+                    <tr>
+	                    <td>Sphenodon punctatus</td>
+	                    <td>0.7</td>
+	                    <td>573</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

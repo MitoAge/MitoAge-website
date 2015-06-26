@@ -1,0 +1,89 @@
+{% extends "admin/base_site.html" %}
+
+{% block breadcrumbs %}
+{% endblock %}
+
+{% block content %}
+    <div id="content-main">
+    
+        <div class="module" >
+            <div class="alert alert-info" role="info">
+                <h4>Base composition data import</h4>
+	            <p><br/>This page allows you to import off-site generated <b>base composition</b> data (CSV format) into MitoAge.</p>
+				<p>Upload a comma seperated text file (CSV) below and submit. <br/>
+					Following the upload, you will be able to review the data (errors, entries already in the DB, new entries to be added).<br/>
+					You are also allowed to choose below for which section the data is to be used (e.g. total mtDNA, protein-coding, specific gene etc)
+				</p>
+				<br/>
+                <h4>Data format</h4>
+	            <p><br/>Data must be in a CSV format. The following columns are mandatory: Species, G, C, A, T, Other, mtDNA size (bp),<br/>  
+	            The first line of the file should contain the header with at least 7 columns (non-relevant columns will be ignored).</p> 
+			</div>
+
+            <div class="alert alert-success" role="success">
+                <h4>Upload file</h4>
+				<form id="import-uploadform" action="{% url 'admin:bc_csvimport' %}" method="post" enctype="multipart/form-data">
+					{% csrf_token %} 
+					<input type="file" name="bc_file" />
+					<br/>Destined to <select id="bc_section" name="bc_section">
+			            <option value='total_mtDNA'>Total mtDNA</option>
+			            <option value='total_pc_mtDNA'>Protein coding mtDNA</option>
+			            <option value='d_loop_mtDNA'>D-loop region of the mtDNA</option>
+			            <option value='total_rRNA_mtDNA'>Total rRNA-coding mtDNA</option>
+			            <option value='atp6'>Gene: atp6</option>
+			            <option value='atp8'>Gene: atp8</option>
+			            <option value='cox1'>Gene: cox1</option>
+			            <option value='cox2'>Gene: cox2</option>
+			            <option value='cox3'>Gene: cox3</option>
+			            <option value='cytb'>Gene: cytb</option>
+			            <option value='nd1'>Gene: nd1</option>
+			            <option value='nd2'>Gene: nd2</option>
+			            <option value='nd3'>Gene: nd3</option>
+			            <option value='nd4'>Gene: nd4</option>
+			            <option value='nd4l'>Gene: nd4l</option>
+			            <option value='nd5'>Gene: nd5</option>
+			            <option value='nd6'>Gene: nd6</option>
+			            <option value='rRNA_12S'>rRNA 12S ribosomal unit</option>
+			            <option value='rRNA_16S'>rRNA 16S ribosomal unit</option>
+					</select> section<br/>
+					<button type="submit" class="button blue-button">Upload</button>
+				</form>
+			</div>
+
+            <h3>Upload example</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+	                    <th>Species</th>
+	                    <th>G</th>
+	                    <th>C</th>
+	                    <th>A</th>
+	                    <th>T</th>
+	                    <th>Other</th>
+	                    <th>mtDNA size (bp)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+	                    <td>Abacion magnum</td>
+	                    <td>186</td>
+	                    <td>56</td>
+	                    <td>220</td>
+	                    <td>211</td>
+	                    <td>1</td>
+	                    <td>674</td>
+                    </tr>
+                    <tr>
+	                    <td>Abalistes stellaris</td>
+	                    <td>234</td>
+	                    <td>80</td>
+	                    <td>182</td>
+	                    <td>187</td>
+	                    <td>0</td>
+	                    <td>683</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

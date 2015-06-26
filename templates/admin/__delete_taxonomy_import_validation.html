@@ -1,0 +1,109 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrahead %}
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+	
+	<div class="container">
+	  <div class="panel-group" id="accordion">
+	  
+	    <div class="panel panel-default">
+	      <div class="panel-heading">
+	        <h2 class="panel-title">
+	          <a data-toggle="collapse" data-parent="#accordion" href="#taxonomy_classes">Taxonomy classes</a>
+	        </h2>
+	      </div>
+	      <div id="taxonomy_classes" class="panel-collapse collapse in">
+	        <div class="panel-body">This upload will add 5 new taxonomy classes. Species are also added for 3 of the existing classes. In total the DB will have entries for 30 taxonomy classes. </div>
+	        
+	        
+			        	<div class="container">
+						  <div class="panel-group" id="accordion1">
+						  
+						    <div class="panel panel-default">
+						      <div class="panel-heading">
+						        <h5 class="panel-title">
+						          <a data-toggle="collapse" data-parent="#accordion" href="#new_classes">New classes added... </a>
+						        </h5>
+						      </div>
+						      <div id="new_classes" class="panel-collapse collapse in">
+						        <div class="panel-body">The following classes will be added in this upload: </div>
+						      </div>
+						    </div>
+						    
+						    <div class="panel panel-default">
+						      <div class="panel-heading">
+						        <h5 class="panel-title">
+						          <a data-toggle="collapse" data-parent="#accordion" href="#updated_classes">Updated classes (3/27)... </a>
+						        </h5>
+						      </div>
+						      <div id="updated_classes" class="panel-collapse collapse">
+						        <div class="panel-body">Entries will be added to the following existing classes: </div>
+						      </div>
+						    </div>
+						    
+						    <div class="panel panel-default">
+						      <div class="panel-heading">
+						        <h4 class="panel-title">
+						          <a data-toggle="collapse" data-parent="#accordion" href="#collapse1_3">Collapsible Group 3</a>
+						        </h4>
+						      </div>
+						      <div id="collapse1_3" class="panel-collapse collapse">
+						        <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+						        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+						        quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+						      </div>
+						    </div>
+						    
+						  </div> 
+						</div>
+	        
+	      </div>
+	    </div>
+
+	    <hr/>
+	    
+	    <div class="panel panel-default">
+	      <div class="panel-heading">
+	        <h2 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#taxonomy_orders">Taxonomy orders</a></h2>
+	      </div>
+	      <div id="taxonomy_orders" class="panel-collapse collapse">
+	        <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+	        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+	        quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+	      </div>
+	    </div>
+
+	    <hr/>
+	    
+	    <div class="panel panel-default">
+	      <div class="panel-heading">
+	        <h2 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#taxonomy_orders">Taxonomy families</a></h2>
+	      </div>
+	      <div id="taxonomy_orders" class="panel-collapse collapse">
+	        <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+	        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+	        quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+	      </div>
+	    </div>
+
+	    <hr/>
+	    
+	    <div class="panel panel-default">
+	      <div class="panel-heading">
+	        <h2 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#taxonomy_species">Taxonomy species</a></h2>
+	      </div>
+	      <div id="taxonomy_species" class="panel-collapse collapse">
+	        <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+	        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+	        quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+	      </div>
+	    </div>
+	    
+	  </div> 
+	</div>
+	
+	
+{% endblock %}

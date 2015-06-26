@@ -1,0 +1,80 @@
+{% extends "admin/base_site.html" %}
+
+{% block breadcrumbs %}
+{% endblock %}
+
+{% block content %}
+    <div id="content-main">
+    
+        <div class="module" >
+            <div class="alert alert-info" role="info">
+                <h4>Codon usage data import</h4>
+	            <p><br/>This page allows you to import off-site generated <b>codon usage</b> data (CSV format) into MitoAge.</p>
+				<p>Upload a comma seperated text file (CSV) below and submit. <br/>
+					Following the upload, you will be able to review the data (errors, entries already in the DB, new entries to be added).<br/>
+					You are also allowed to choose below for which section the data is to be used (e.g. protein-coding, specific gene etc)
+				</p>
+				<br/>
+                <h4>Data format</h4>
+	            <p><br/>Data must be in a CSV format. The following columns are mandatory: {{cup_columns}}<br/>  
+	            The first line of the file should contain the header with at least 67 (!) columns (non-relevant columns will be ignored).</p> 
+			</div>
+
+            <div class="alert alert-success" role="success">
+                <h4>Upload file</h4>
+				<form id="import-uploadform" action="{% url 'admin:cu_csvimport' %}" method="post" enctype="multipart/form-data">
+					{% csrf_token %} 
+					<input type="file" name="cu_file" />
+					<br/>Destined to <select id="cu_section" name="cu_section">
+			            <option value='total_pc_mtDNA'>Protein coding mtDNA</option>
+			            <option value='atp6'>Gene: atp6</option>
+			            <option value='atp8'>Gene: atp8</option>
+			            <option value='cox1'>Gene: cox1</option>
+			            <option value='cox2'>Gene: cox2</option>
+			            <option value='cox3'>Gene: cox3</option>
+			            <option value='cytb'>Gene: cytb</option>
+			            <option value='nd1'>Gene: nd1</option>
+			            <option value='nd2'>Gene: nd2</option>
+			            <option value='nd3'>Gene: nd3</option>
+			            <option value='nd4'>Gene: nd4</option>
+			            <option value='nd4l'>Gene: nd4l</option>
+			            <option value='nd5'>Gene: nd5</option>
+			            <option value='nd6'>Gene: nd6</option>
+					</select> section<br/>
+					<button type="submit" class="button blue-button">Upload</button>
+				</form>
+			</div>
+
+            <h3>Upload example</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                    	{% for column in cup_columns %}
+	                    <th>{{column}}</th>
+	                    {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+	                    <td>Abacion magnum</td>
+	                    <td>MNENLFA...</td>
+                    	{% for column in cup_columns %}
+                    		{% if column != 'Species' and column != 'Amino Acids' %}
+		                    	<td>int</td>
+		                    {% endif %}
+	                    {% endfor %}
+                    </tr>
+                    <tr>
+	                    <td>Abalistes stellaris</td>
+	                    <td>MNENLFA...</td>
+                    	{% for column in cup_columns %}
+                    		{% if column != 'Species' and column != 'Amino Acids' %}
+		                    	<td>int</td>
+		                    {% endif %}
+	                    {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

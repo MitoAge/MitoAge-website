@@ -1,0 +1,209 @@
+{% extends "admin/base_site.html" %}
+
+{% load templatetags_extra %}
+
+{% block breadcrumbs %}
+{% endblock %}
+
+{% block content %}
+    <div id="content-main">
+        <div class="module" >
+        
+			{% if error_type = "wrong columns" %}
+                <div class="alert alert-danger" role="alert">
+                	<h4>{{ title }}</h4>
+					<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+					<p><br/>Column format is incorrect in {{filename}}!</p>
+					<p>Please upload a comma separated text file (CSV) with the following 5 columns: [Species, Family, Order, Class, Common name]. Please see example below.
+					<br/>Provided columns in {{filename}} were: {{tp.csvreader.fieldnames}}.</p>
+					<p>Column names should appear on the first line of the file as a header.</p>
+					<p>Data must be in a CSV format. Name of species is mandatory; families, orders and class are all optional. Common name is optional. 
+					<br/>Header row is mandatory.</p> 
+				</div> 
+			{% elif error_type = "wrong format or inconsistent columns" %}
+			
+                <div class="alert alert-danger" role="alert">
+                	<h4>{{ title }}</h4>
+					<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+					<p>There are inconsistencies in the input file ({{filename}})!  <br/>Please resolve these issues before proceeding further. <br/><br/></p>
+					<p><b>Lines in the file that present clashes:</b><br/>
+					{% for error in errors %}
+						<li>Line {{ error.line }} (<b>{{ error.line_description }}</b>)
+							<ul>
+							{% for clash in error.clashes %}
+								<li>is clashing with line {{ clash.0 }} (<i>{{clash.1|safe}}</i>).</li>
+							{% endfor %}
+							</ul>
+						</li>
+				    {% endfor %}
+
+					</p>
+					<p><br/>Please note that these checks are input-related and hence pre-database testing. 
+					A separate check against the database will be done after the input inconsistencies are resolved. </p> 
+					<p>For space efficiency, only forward clashes are reported (e.g. if line 2 clashes with line 7, the clash between 7 and 2 is not reported again).</p> 
+				</div>
+			{% elif error_type = "clashes_with_db" %}
+                <div class="alert alert-danger" role="alert">
+                	<h4>{{ title }}</h4>
+					<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+
+					<p><br/>Imported file has lines that are inconsistent with existing entries in the database. 
+						These inconsistency are probably due to different classes/orders/families in the file and the database, for the same order/family/species
+					</p>
+					<p><b>Lines in the file ({{filename}}) that present clashes with the current database:</b><br/>
+					
+					{% for species, detailed in db_errors %}
+						<li> <b>{{ species.short_description }}</b> == Error: {{detailed}}</li>
+				    {% endfor %}
+					</p>
+					<p><br/>Unfortunately, at the moment updating previously added entries can be done only manually. Please resolve all the above issues before proceeding further. </p> 
+					<p>For space efficiency, all clashes are reported only once (please check also for duplicate lines).</p> 
+				</div>
+			{% elif error_type = "no_significant_errors" %}
+                <div class="alert alert-success" role="success">
+					{% if new_entries_to_be_added %}
+					<div style="float:right;">
+						<form id="proceed-upload" action="{% url 'admin:taxonomy_csvimportcomplete' %}" method="post" enctype="multipart/form-data">
+							{% csrf_token %} 
+			                <input type="hidden" value="{{ data }}" name="data" />
+							<button type="submit" class="button blue-button">Proceed with import</button>
+						</form>
+					</div>
+					{% endif %}
+                
+                	<h4>{{ title }}</h4>
+					
+					<p><br/> Successful parsing. Below is a list of the new entries that will be added to the database. </p>
+					<p>
+						{% for species, detailed in new_entries_to_be_added %}
+							<li> {{ species.short_description }} </li>
+					    {% endfor %}
+					</p>
+					{% if not new_entries_to_be_added %}
+						<li>No new species to add.<br/></li> 
+					{% endif %}
+					
+					{% if ignored %} 
+						<br/>
+						<div class="alert alert-warning" role="alert">
+							<p>Additionally, several entries with missing fields will also be added. Please see details in the next section and if they require reviewing go back! </p>
+						</div>
+					{% endif %}
+				</div>
+			{% endif %}
+				
+			{% if ignored %}
+                <div class="alert alert-warning" role="alert">
+                	{% if error_type = "no_significant_errors" %}
+					<div style="float:right;">
+						<form id="proceed-upload" action="{% url 'admin:taxonomy_csvimportcomplete' %}" method="post" enctype="multipart/form-data">
+							{% csrf_token %} 
+			                <input type="hidden" value="{{ data }}" name="data" />
+							<button type="submit" class="button blue-button">Proceed with import</button>
+						</form>
+					</div>
+					{% endif %}
+
+                	<h4>Incomplete lines in input (everything after the first missing field would be ignored)</h4>
+					<p><br/>The following lines in your file contain missing fields:</p>
+					<p>
+	                	{% for entry in ignored %}
+	                		<li>{{entry.additional_message|safe}}</li>
+	                	{% endfor %}
+					</p>
+					<p></p> 
+				</div>
+			{% endif %} 
+
+			{% if duplicates %}
+                <div class="alert alert-warning" role="alert">
+                	<h4>Duplicated lines</h4>
+					<p><br/>Additionally, there are a number of duplicated lines in your input file. If no action is taken, duplicates will be ignored. <br/>
+					For a list, please see below: </p>
+					<p>
+	                	{% for entry in duplicates %}
+	                		<li>{{entry.additional_message}}</li>
+	                	{% endfor %}
+					</p>
+					<p></p> 
+				</div>
+			{% endif %} 
+
+			{% if already_in_db %}
+                <div class="alert alert-warning" role="alert">
+                	<h4>Entries found already in the database</h4>
+					<p><br/> The following entries are already in the database and will be skipped. No action required. </p>
+					<p>
+						{% for species, detailed in already_in_db %}
+							<li> {{ species.short_description }} </li>
+					    {% endfor %}
+					</p>
+				</div>
+			{% endif %} 
+
+			
+			{% if include_input %}
+            <h3>Input file ({{filename}})</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                    	<th>No.</th>
+	                    <th>Species</th>
+	                    <th>Family</th>
+	                    <th>Order</th>
+	                    <th>Class</th>
+	                    <th>Common name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                	{% for row in tp.dictlist %}
+                    <tr>
+                    	<td width="30px">{{forloop.counter}}</td>
+	                    <td>{{row.Species}}</td>
+	                    <td>{{row.Family}}</td>
+	                    <td>{{row.Order}}</td>
+	                    <td>{{row.Class}}</td>
+	                    <td>{{row|field_in_dictionary:"Common name"}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+			{% endif %}
+			
+			
+			{% if include_example %}
+            <h3>Upload example</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+	                    <th>Species</th>
+	                    <th>Family</th>
+	                    <th>Order</th>
+	                    <th>Class</th>
+	                    <th>Common name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+	                    <td>Phrynocephalus grumgrzimailoi</td>
+	                    <td>Agamidae</td>
+	                    <td>Squamata</td>
+	                    <td>Reptilia</td>
+	                    <td>Grumgrzimail's Toadhead Agama</td>
+                    </tr>
+                    <tr>
+	                    <td>Sphenodon punctatus</td>
+	                    <td>Sphenodontidae</td>
+	                    <td>Rhynchocephalia</td>
+	                    <td>Reptilia</td>
+	                    <td>Northern Tuatara</td>
+                    </tr>
+                </tbody>
+            </table>
+			{% endif %}
+        </div>
+        
+        <a href="{% url 'admin:taxonomy_csvimport' %}"> Return to upload </a>
+        
+    </div>
+{% endblock %}

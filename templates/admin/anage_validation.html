@@ -1,0 +1,175 @@
+{% extends "admin/base_site.html" %}
+
+{% load templatetags_extra %}
+
+{% block breadcrumbs %}
+{% endblock %}
+
+{% block content %}
+    <div id="content-main">
+        <div class="module" >
+        
+			{% if error_type = "wrong columns" %}
+                <div class="alert alert-danger" role="alert">
+                	<h4>{{ title }}</h4>
+					<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+					<p><br/>Column format is incorrect in {{filename}}!</p>
+					<p>Please upload a comma separated text file (CSV) with the following 3 columns: Species, Lifespan and HAGRID.<br/> 
+						Provided columns in {{filename}} were: {{ap.csvreader.fieldnames}}.</p>
+					<p>Column names should appear on the first line of the file as a header.</p>
+					<p>Data must be in a CSV format. Header row is mandatory and all 3 columns are required (see example below). </p> 
+				</div> 
+				
+			{% elif error_type = "wrong format or inconsistent columns" %}
+
+				{% if errors %}
+                <div class="alert alert-danger" role="alert">
+                	<h4>{{ title }}</h4>
+					<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+					<p>There are inconsistencies in the input file ({{filename}})!  Please resolve these issues before proceeding further. <br/><br/></p>
+					<p><b>Lines in the file that present clashes:</b><br/>
+					{% for error in errors %}
+						<li>Line {{ error.line }} (<b>{{ error.line_description }}</b>)
+							<ul>
+							{% for clash in error.clashes %}
+								<li>is clashing with line {{ clash.0 }} (<i>{{clash.1|safe}}</i>).</li>
+							{% endfor %}
+							</ul>
+						</li>
+				    {% endfor %}
+
+					</p>
+					<p><br/>Please note that these checks are input-related and hence pre-database testing. 
+					A separate check against the database will be done after the input inconsistencies are resolved. </p> 
+					<p>For space efficiency, only forward clashes are reported (e.g. if line 2 clashes with line 7, the clash between 7 and 2 is not reported again).</p> 
+				</div>
+				{% endif %} 
+
+			{% elif error_type = "clashes_with_db" %}
+                <div class="alert alert-danger" role="alert">
+                	<h4>{{ title }}</h4>
+					<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+
+					<p><br/>Imported file has lines that are inconsistent (non-existent species or different lifespan previously recorded) with existing entries in the database. 
+					</p>
+					<p><b>Lines in the file ({{filename}}) that present clashes with the current database:</b><br/>
+					
+					{% for rows in db_errors %}
+						<li> <b>{{ rows }}</b></li>
+				    {% endfor %}
+				    
+					</p>
+					<p><br/>Unfortunately, at the moment updating previously added entries can be done only manually. Please resolve all the above issues before proceeding further. </p> 
+				</div>
+				
+			{% elif error_type = "no_significant_errors" %}
+                <div class="alert alert-success" role="success">
+					{% if consistent_changes %}
+					<div style="float:right;">
+						<form id="proceed-upload" action="{% url 'admin:anage_csvimportcomplete' %}" method="post" enctype="multipart/form-data">
+							{% csrf_token %} 
+			                <input type="hidden" value="{{ data }}" name="data" />
+							<button type="submit" class="button blue-button">Proceed with import</button>
+						</form>
+					</div>
+					{% endif %}
+                
+                	<h4>{{ title }}</h4>
+					
+					<p><br/> Successful parsing. Below is a list of the species that will be updated with lifespan and HAGR ID data. 
+					
+					{% if duplicates or already_in_db %} <br/>Additionally, several entries are duplicates in input or are already in the database. Please see next sections and if they require reviewing go back! {% endif %}
+					</p>
+					<p>
+						{% for row in consistent_changes %}
+							<li> {{ row.1 }} </li>
+					    {% endfor %}
+					</p>
+					{% if not consistent_changes %}
+						<li>No new species to add.<br/></li> 
+					{% endif %}
+				</div>
+			{% endif %}
+				
+			{% if duplicates %}
+                <div class="alert alert-warning" role="alert">
+                	<h4>Duplicated lines</h4>
+					<p><br/>Additionally, there are a number of duplicated lines in your input file. If no action is taken, duplicates will be ignored. <br/>
+					For a list, please see below: </p>
+					<p>
+	                	{% for row in duplicates %}
+	                		<li>{{row.additional_message}}</li>
+	                	{% endfor %}
+					</p>
+					<p></p> 
+				</div>
+			{% endif %} 
+
+			{% if already_in_db %}
+                <div class="alert alert-warning" role="alert">
+                	<h4>Entries found already in the database</h4>
+					<p><br/> The following entries are already in the database and will be skipped. No action required. </p>
+					<p>
+						{% for rows in already_in_db %}
+							<li> {{ rows }} </li>
+					    {% endfor %}
+					</p>
+				</div>
+			{% endif %} 
+
+			
+			{% if include_input %}
+            <h3>Input file ({{filename}})</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                    	<th>No.</th>
+	                    <th>Species</th>
+	                    <th>Lifespan</th>
+	                    <th>HAGRID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                	{% for row in ap.dictlist %}
+                    <tr>
+                    	<td width="30px">{{forloop.counter}}</td>
+	                    <td>{{row.Species}}</td>
+	                    <td>{{row.Lifespan}}</td>
+	                    <td>{{row.HAGRID}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+			{% endif %}
+			
+			
+			{% if include_example %}
+            <h3>Upload example</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+	                    <th>Species</th>
+	                    <th>Lifespan</th>
+	                    <th>HAGRID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+	                    <td>Phrynocephalus grumgrzimailoi</td>
+	                    <td>5</td>
+	                    <td>471</td>
+                    </tr>
+                    <tr>
+	                    <td>Sphenodon punctatus</td>
+	                    <td>0.7</td>
+	                    <td>573</td>
+                    </tr>
+                </tbody>
+            </table>
+			{% endif %}
+        </div>
+        
+        <a href="{% url 'admin:anage_csvimport' %}"> Return to upload </a>
+        
+    </div>
+{% endblock %}

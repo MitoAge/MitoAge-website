@@ -1,0 +1,61 @@
+{% extends "admin/base_site.html" %}
+
+{% block breadcrumbs %}
+{% endblock %}
+
+{% block content %}
+    <div id="content-main">
+    
+        <div class="module" >
+            <div class="alert alert-info" role="info">
+                <h4>Taxonomy data import</h4>
+	            <p><br/>This page allows you to import taxonomy data (CSV format) into MitoAge.</p>
+				<p>Upload a comma seperated text file (CSV) below and submit. <br/>
+					Following the upload, you will be able to review the data (errors, duplicate or incomplete lines, entries already in the DB, new entries to be added). 
+				</p>
+				<br/>
+                <h4>Data format</h4>
+	            <p><br/>Data must be in a CSV format. Name of species is mandatory; families, orders and class are all optional. Common name is optional. 
+	            <br/>Although some fields might be optional, the first line of the file is mandatory and should contain the header with all 5 columns (please see example below).</p>
+			</div>
+
+            <div class="alert alert-success" role="success">
+                <h4>Upload file</h4>
+				<form id="import-uploadform" action="{% url 'admin:taxonomy_csvimport' %}" method="post" enctype="multipart/form-data">
+					{% csrf_token %} 
+					<input type="file" name="taxonomy_file" />
+					<button type="submit" class="button blue-button">Upload</button>
+				</form>
+			</div>
+
+            <h3>Upload example</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+	                    <th>Species</th>
+	                    <th>Family</th>
+	                    <th>Order</th>
+	                    <th>Class</th>
+	                    <th>Common name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+	                    <td>Phrynocephalus grumgrzimailoi</td>
+	                    <td>Agamidae</td>
+	                    <td>Squamata</td>
+	                    <td>Reptilia</td>
+	                    <td>Grumgrzimail's Toadhead Agama</td>
+                    </tr>
+                    <tr>
+	                    <td>Sphenodon punctatus</td>
+	                    <td>Sphenodontidae</td>
+	                    <td>Rhynchocephalia</td>
+	                    <td>Reptilia</td>
+	                    <td>Northern Tuatara</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

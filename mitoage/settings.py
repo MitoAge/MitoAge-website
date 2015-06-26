@@ -1,4 +1,11 @@
 """ ================= General settings ================= """
+import os
+
+import dj_database_url
+from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
+from django.core.urlresolvers import reverse
+
+
 ADMINS = ( ('Robi Tacutu', 'robi.tacutu@gmail.com'), )
 MANAGERS = ADMINS
 
@@ -13,7 +20,6 @@ USE_TZ = True
 SITE_ID = 1
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # Quick-start development settings - unsuitable for production
@@ -53,6 +59,8 @@ INSTALLED_APPS = (
     # Our packages:
     'mitoage',
     'mitoage.static_pages',
+    'mitoage.taxonomy',
+    'mitoage.analysis',
 
     # Admin:
     'suit',
@@ -73,7 +81,6 @@ MIDDLEWARE_CLASSES = (
 
 
 """ ================= Template loaders & directories ================= """
-from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -95,7 +102,6 @@ TEMPLATE_CONTEXT_PROCESSORS = TCP + (
 
 
 """ ================= Database ================= """
-import dj_database_url
 DATABASES = {
     'default': {
         'ENGINE': '', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
@@ -132,12 +138,23 @@ SUIT_CONFIG = {
     'MENU_OPEN_FIRST_CHILD': True, # Default True
     'MENU': (
         {'label': 'Back to website', 'icon':'icon-heart', 'url': '/'},
-        {'app': 'sites', 'label': 'Sites & settings', 'icon':'icon-leaf', 'models': (
+        {'app': 'sites', 'label': 'Sites & settings', 'icon':'icon-cog', 'models': (
             'site',
         )},
         {'app': 'auth', 'label': 'Authentication', 'icon':'icon-lock', 'models': (
             'auth.user', 'auth.group', 
         )},
+        {'app': 'taxonomy', 'label': 'Taxonomy', 'icon':'icon-leaf', 'models': (
+            'taxonomy.taxonomyspecies', 'taxonomy.taxonomyfamily', 'taxonomy.taxonomyorder', 'taxonomy.taxonomyclass', 
+            {'url': 'admin:taxonomy_csvimport', 'label': 'Import taxonomy'},
+        )},
+        {'label': 'Lifespan@AnAge', 'icon':'icon-tag', 'url': 'admin:anage_csvimport'},
+        {'app': 'analysis', 'label': 'MitoAge', 'icon':'icon-star', 'models': (
+            'analysis.mitoageentry',  
+            {'url': 'admin:bc_csvimport', 'label': 'Import base composition'},
+            {'url': 'admin:cu_csvimport', 'label': 'Import codon usage'},
+        )},
+        {'label': 'Future ToDOs', 'icon':'icon-list-alt', 'url': 'admin:todo_list'},
     ),
     # misc
     'LIST_PER_PAGE': 15
