@@ -2,14 +2,18 @@
 from django.conf.urls import patterns, url
 from django.views.generic.base import TemplateView
 
+from mitoage.taxonomy.views import BrowseAllClassesList, TaxonomyClassDetail, \
+    TaxonomyOrderDetail, TaxonomyFamilyDetail
+
 
 urlpatterns = patterns('mitoage.taxonomy.views',
-    url(r'^taxonomy/browser/$', TemplateView.as_view(template_name="static_pages/home.html"), name='browse_taxonomy'),
-)
 
-"""
-    url(r'^taxonomy/browse/$', 'browse_taxonomy', name='browse_taxonomy'),
-    url(r'^taxonomy/browse/$', 'browse_taxonomy', name='browse_taxonomy'),
-    url(r'^taxonomy/browse/$', 'browse_taxonomy', name='browse_taxonomy'),
-    url(r'^user/(?P<user_short_url>[\w]+)/profile/$', 'trust_me.user_management.views.user_profile', name='user_profile'),
-"""
+    url(r'^browse/taxonomy/$', BrowseAllClassesList.as_view(), name='browse_taxonomy'),
+    url(r'^browse/(?P<pk>[0-9]+)/class/$', TaxonomyClassDetail.as_view(), name='browse_class'),
+    url(r'^browse/(?P<pk>[0-9]+)/order/$', TaxonomyOrderDetail.as_view(), name='browse_order'),
+    url(r'^browse/(?P<pk>[0-9]+)/family/$', TaxonomyFamilyDetail.as_view(), name='browse_family'),
+    url(r'^view/(?P<pk>[0-9]+)/species/$', TemplateView.as_view(template_name="static_pages/home.html"), name='view_species'),
+
+    url(r'^browse/genes/$', TemplateView.as_view(template_name="static_pages/home.html"), name='browse_genes'),
+    url(r'^view/(?P<gene>[\w]+)/gene/$', TemplateView.as_view(template_name="static_pages/home.html"), name='view_gene'),
+)

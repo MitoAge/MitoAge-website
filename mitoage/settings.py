@@ -61,6 +61,9 @@ INSTALLED_APPS = (
     'mitoage.static_pages',
     'mitoage.taxonomy',
     'mitoage.analysis',
+    
+    # 3rd party packages:
+    'bootstrap_pagination',
 
     # Admin:
     'suit',
@@ -96,7 +99,7 @@ TEMPLATE_DIRS = (
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = TCP + (
-    'django.core.context_processors.request',   # needed for django-suit!
+    'django.core.context_processors.request',   # needed for django-suit! and bootstrap-pagination
 )
 
 

@@ -1,7 +1,6 @@
 from django.core import urlresolvers
 from django.db import models, transaction
 
-
 class ClickableTaxonomyModel(models.Model):
     class Meta: 
         abstract = True
@@ -14,19 +13,24 @@ class TaxonomyClass(ClickableTaxonomyModel):
     class Meta:
         verbose_name = "class"
         verbose_name_plural = "classes"
+        ordering = ["name"]
     name = models.CharField("Class name", max_length=64)
-    
+            
     def __unicode__(self):
         return self.name
     
     def is_same(self, another_class):
         return self.name == another_class.name
+    
+    def number_of_species(self):
+        return TaxonomySpecies.objects.filter(taxonomy_family__taxonomy_order__taxonomy_class=self).count()
 
 
 class TaxonomyOrder(ClickableTaxonomyModel):
     class Meta:
         verbose_name = "order"
         verbose_name_plural = "orders"
+        ordering = ["name"]
 
     name = models.CharField("Order name", max_length=64)
     taxonomy_class = models.ForeignKey(TaxonomyClass, blank=True, null = True, related_name='taxonomy_orders')
@@ -46,6 +50,9 @@ class TaxonomyOrder(ClickableTaxonomyModel):
             return False
         return self.taxonomy_class.is_same(another_order.taxonomy_class)
 
+    def number_of_species(self):
+        return TaxonomySpecies.objects.filter(taxonomy_family__taxonomy_order=self).count()
+
     @transaction.atomic
     def save(self, *args, **kwargs):
         # if we have a class, it is possible that it does not exist in the database
@@ -62,6 +69,7 @@ class TaxonomyFamily(ClickableTaxonomyModel):
     class Meta:
         verbose_name = "family"
         verbose_name_plural = "families"
+        ordering = ["name"]
     name = models.CharField("Family name", max_length=64)
     taxonomy_order = models.ForeignKey(TaxonomyOrder, blank=True, null = True, related_name='taxonomy_families')
 
@@ -79,6 +87,9 @@ class TaxonomyFamily(ClickableTaxonomyModel):
         if self.taxonomy_order is None or another_family.taxonomy_order is None:
             return False
         return self.taxonomy_order.is_same(another_family.taxonomy_order)
+
+    def number_of_species(self):
+        return TaxonomySpecies.objects.filter(taxonomy_family=self).count()
 
     @transaction.atomic
     def save(self, *args, **kwargs):
@@ -108,6 +119,7 @@ class TaxonomySpecies(models.Model):
     class Meta:
         verbose_name = "species"
         verbose_name_plural = "species"
+        ordering = ["name"]
     name = models.CharField("Scientific name", max_length=64)
     common_name = models.CharField(max_length=64)
     taxonomy_family = models.ForeignKey(TaxonomyFamily, blank=True, null = True, related_name='taxonomy_species')
