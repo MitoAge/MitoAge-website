@@ -124,6 +124,8 @@ class MitoAgeEntryAdmin(ModelAdmin):
                MitoAgeCodonUsageInlineCOX2,MitoAgeCodonUsageInlineCOX3,MitoAgeCodonUsageInlineCYTB,MitoAgeCodonUsageInlineND1,
                MitoAgeCodonUsageInlineND2,MitoAgeCodonUsageInlineND3,MitoAgeCodonUsageInlineND4,MitoAgeCodonUsageInlineND4L,
                MitoAgeCodonUsageInlineND5,MitoAgeCodonUsageInlineND6]
+    list_filter = ('species__taxonomy_family__name', 'species__taxonomy_family__taxonomy_order__name', 'species__taxonomy_family__taxonomy_order__taxonomy_class__name', )
+    search_fields = ('species__name', )
 
     fieldsets = (
         ('General', {
@@ -234,7 +236,7 @@ class MitoAgeEntryAdmin(ModelAdmin):
             filename = csvfile.name
             
             bc_section = request.POST['bc_section']
-            if not bc_section in MitoAgeEntry.get_bc_sections():
+            if not bc_section in BaseComposition.get_bc_sections():
                 # incorrect columns
                 title, include_example, include_input, error_type = "Base composition upload error - wrong section selection", False, False, "wrong section"
                 return render_to_response('admin/base_composition_validation.html', locals(), RequestContext(request))
@@ -287,7 +289,7 @@ class MitoAgeEntryAdmin(ModelAdmin):
         data = json.loads(request.POST['data'])
 
         bc_section = request.POST['section']
-        if not bc_section in MitoAgeEntry.get_bc_sections():
+        if not bc_section in BaseComposition.get_bc_sections():
             # incorrect columns
             title, include_example, include_input, error_type = "Base composition upload error - wrong section selection", False, False, "wrong section"
             return render_to_response('admin/base_composition_validation.html', locals(), RequestContext(request))
@@ -348,7 +350,7 @@ class MitoAgeEntryAdmin(ModelAdmin):
             filename = csvfile.name
             
             cu_section = request.POST['cu_section']
-            if not cu_section in MitoAgeEntry.get_cu_sections():
+            if not cu_section in CodonUsage.get_cu_sections():
                 # incorrect columns
                 title, include_example, include_input, error_type = "Codon usage upload error - wrong section selection", False, False, "wrong section"
                 return render_to_response('admin/codon_usage_validation.html', locals(), RequestContext(request))
@@ -404,7 +406,7 @@ class MitoAgeEntryAdmin(ModelAdmin):
         data = json.loads(request.POST['data'])
 
         cu_section = request.POST['section']
-        if not cu_section in MitoAgeEntry.get_cu_sections():
+        if not cu_section in CodonUsage.get_cu_sections():
             # incorrect columns
             title, include_example, include_input, error_type = "Codon usage upload error - wrong section selection", False, False, "wrong section"
             return render_to_response('admin/codon_usage_validation.html', locals(), RequestContext(request))

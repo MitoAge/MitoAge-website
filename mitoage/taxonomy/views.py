@@ -4,6 +4,7 @@ from django.views.generic.list import ListView
 
 from mitoage.taxonomy.models import TaxonomyClass, TaxonomyOrder, TaxonomyFamily, \
     TaxonomySpecies
+from mitoage.analysis.models import MitoAgeEntry
 
 
 class SpeciesView(object):
@@ -111,4 +112,15 @@ class TaxonomySpeciesDetail(DetailView):
                                   Breadcrumb(self.object.taxonomy_family.taxonomy_order.name, "browse_order", self.object.taxonomy_family.taxonomy_order),
                                   Breadcrumb(self.object.taxonomy_family.name, "browse_family", self.object.taxonomy_family),
                                   Breadcrumb(self.object.name, "", None),]
+        context['base_compositions'] = self.get_base_compositions(self.object)
         return context
+
+    def get_base_compositions(self, species):
+        try:
+            mitoage_entry = species.mitoage_entries.first()
+            return mitoage_entry.get_base_compositions_as_dictionaries()
+        except MitoAgeEntry.DoesNotExist:
+            return {'total_mtDNA': None, 'total_pc_mtDNA': None, 'd_loop_mtDNA': None, 'total_rRNA_mtDNA': None, 'atp6': None, 'atp8': None,
+            'cox1': None, 'cox2': None, 'cox3': None, 'cytb': None, 'nd1': None, 'nd2': None, 'nd3': None, 'nd4': None, 'nd4l': None,
+            'nd5': None, 'nd6': None, 'rRNA_12S': None, 'rRNA_16S': None}
+

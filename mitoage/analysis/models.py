@@ -12,6 +12,9 @@ class BaseComposition():
         self.t = t
         self.others = others
 
+    def g_1kb(self):
+        return self.g*1000/self.size
+
     def is_same(self, other):
         return self.size==other.size and self.g==other.g and self.c==other.c and self.a==other.a and self.t==other.t and self.others==other.others 
 
@@ -24,8 +27,41 @@ class BaseComposition():
     def to_string(self):
         return "[G:%s;C:%s;A:%s;T:%s;O:%s] - size: %s bp" % (self.g, self.c, self.a, self.t, self.others, self.size)
 
+    @staticmethod
+    def get_bc_sections():
+        return ['total_mtDNA', 'total_pc_mtDNA', 'd_loop_mtDNA', 'total_rRNA_mtDNA', 'atp6', 'atp8', 'cox1', 'cox2', 'cox3', 'cytb', 'nd1', 'nd2', 'nd3', 'nd4', 'nd4l', 'nd5', 'nd6', 'rRNA_12S', 'rRNA_16S']
+
+    @staticmethod
+    def get_nice_title(key):
+        return {
+            'total_mtDNA': "Total mtDNA",
+            'total_pc_mtDNA': "Protein-coding region of mtDNA",
+            'd_loop_mtDNA': "D-loop region of mtDNA",
+            'total_rRNA_mtDNA': "Total rRNA-coding region of mtDNA",
+            'atp6': "Gene ATP6",
+            'atp8': "Gene ATP8",
+            'cox1': "Gene COX1",
+            'cox2': "Gene COX2",
+            'cox3': "Gene COX3",
+            'cytb': "Gene CYTB",
+            'nd1': "Gene ND1",
+            'nd2': "Gene ND2",
+            'nd3': "Gene ND3",
+            'nd4': "Gene ND4",
+            'nd4l': "Gene ND4L",
+            'nd5': "Gene ND5",
+            'nd6': "Gene ND6",
+            'rRNA_12S': "12S ribosomal unit of mtDNA",
+            'rRNA_16S': "16S ribosomal unit of mtDNA",
+        }.get(key, "No title")
+
+
 class CodonUsage(models.Model):
-    
+
+    @staticmethod
+    def get_cu_sections():
+        return ['total_pc_mtDNA', 'atp6', 'atp8', 'cox1', 'cox2', 'cox3', 'cytb', 'nd1', 'nd2', 'nd3', 'nd4', 'nd4l', 'nd5', 'nd6']
+
     cu_protein_coding_entry = models.OneToOneField("MitoAgeEntry", related_name = "protein_coding_codon_usage", blank=True, null = True)
     cu_atp6_entry = models.OneToOneField("MitoAgeEntry", related_name = "atp6_codon_usage", blank=True, null = True)
     cu_atp8_entry = models.OneToOneField("MitoAgeEntry", related_name = "atp8_codon_usage", blank=True, null = True)
@@ -186,7 +222,7 @@ class MitoAgeEntry(models.Model):
         verbose_name = "MitoAge entry"
         verbose_name_plural = "MitoAge entries"
     
-    species = models.ForeignKey(TaxonomySpecies, related_name='species')
+    species = models.ForeignKey(TaxonomySpecies, related_name='mitoage_entries')
 
     #Sections with base composition
     #    Total mtDNA
@@ -342,18 +378,11 @@ class MitoAgeEntry(models.Model):
     bc_rRNA_16S_a = models.IntegerField("A content", max_length=11, blank=True, null = True)
     bc_rRNA_16S_others = models.IntegerField("Other", max_length=11, blank=True, null = True)
 
-    
-    
     def __unicode__(self):
         return u"mtDNA analysis of %s " % self.species.name
 
-    @staticmethod
-    def get_bc_sections():
-        return ['total_mtDNA', 'total_pc_mtDNA', 'd_loop_mtDNA', 'total_rRNA_mtDNA', 'atp6', 'atp8', 'cox1', 'cox2', 'cox3', 'cytb', 'nd1', 'nd2', 'nd3', 'nd4', 'nd4l', 'nd5', 'nd6', 'rRNA_12S', 'rRNA_16S']
-
-    @staticmethod
-    def get_cu_sections():
-        return ['total_pc_mtDNA', 'atp6', 'atp8', 'cox1', 'cox2', 'cox3', 'cytb', 'nd1', 'nd2', 'nd3', 'nd4', 'nd4l', 'nd5', 'nd6']
+    def get_base_compositions_as_dictionaries(self):
+        return {key: self.get_base_composition(key) for key in BaseComposition.get_bc_sections()}
 
     def get_base_composition(self, type_of_bc):
         return {
