@@ -6,22 +6,27 @@
 
 {% block page_title %}Taxonomy browsing {% endblock%}
 
-{% block browsing_content %}
-
+{% block content_description %} 
 	<p>In total, our database contains information about {{paginator.count}} taxonomic classes:</p>
-
-	{% for taxonomy_class in object_list %}
-		<li>
-			{% if taxonomy_class.number_of_species != 0 %}
-				<a href="{% url 'browse_class' taxonomy_class.pk %}">{{ taxonomy_class.name }}</a>
-			{% else %} 
-				{{ taxonomy_class }}
-			{% endif %} 
-			({{taxonomy_class.number_of_species}})
-		</li>
-	{% endfor %}
 {% endblock %}
 
+{% block browsing_content %}
+
+	<div class="row">
+		{% for taxonomy_class in object_list %}
+			<div class="col-md-4">
+			<li>
+				{% if taxonomy_class.number_of_species != 0 %}
+					<a href="{% url 'browse_class' taxonomy_class.pk %}">{{ taxonomy_class.name }}</a>
+				{% else %} 
+					{{ taxonomy_class }}
+				{% endif %} 
+				({{taxonomy_class.number_of_species}})
+			</li>
+			</div>
+		{% endfor %}
+	</div>
+{% endblock %}
 
 
 

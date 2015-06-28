@@ -252,6 +252,11 @@ class TaxonomySpecies(models.Model):
     def __unicode__(self):
         return self.name
 
+    def link_to_hagr(self):
+        if not self.hagr_id:
+            return u''
+        return u'<a href="http://genomics.senescence.info/species/query.php?search=%s">%s@AnAge</a>' % (self.hagr_id, self.name) 
+
     def to_string(self):
         return "%s%s, %s" % (self.name, (" (%s)" % self.common_name) if self.common_name is not "" else "", self.taxonomy_family.to_string() if (self.taxonomy_family is not None) else "(No family, order, class assigned)" )
 

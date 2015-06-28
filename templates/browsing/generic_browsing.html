@@ -7,29 +7,44 @@
 	<div class="container">
 		<h1>{% block page_title %}{% endblock %}</h1>
 
-		<div class="col-md-12 column">
-			<ul class="breadcrumb">
-				Browse: 
-				{% for crumb in breadcrumbs %}
-					{% if forloop.last %}
-						<li class="active">
-							{{ crumb.name }}
-						</li>
-					{% else %}
-						<li>
-							<a href="{{ crumb.url }}">{{ crumb.name }}</a> <span class="divider"></span>
-						</li>
-					{% endif %}
-				{% endfor %}
-			
-			</ul>
+		<div class="row">		
+			<div class="col-md-12 column">
+				<ul class="breadcrumb">
+					Browse: 
+					{% for crumb in breadcrumbs %}
+						{% if forloop.last %}
+							<li class="active">
+								{{ crumb.name }}
+							</li>
+						{% else %}
+							<li>
+								<a href="{{ crumb.url }}">{{ crumb.name }}</a> <span class="divider"></span>
+							</li>
+						{% endif %}
+					{% endfor %}
+				
+				</ul>
+			</div>
 		</div>
-	   
-		{% block browsing_content %}{% endblock %}
 
-		{% if is_paginated %}
-			{% bootstrap_paginate page_obj range=5 show_prev_next="true" show_first_last="true" previous_label="Previous" next_label="Next" first_label="First" last_label="Last"%}
-		{% endif %}
+		{% block description_and_pagination %}
+		<div class="row">		
+			<div class="col-md-7">
+				<ul class="pagination">
+				{% block content_description %} {% endblock %}
+				</ul>
+			</div>
+			
+			<div class="col-md-5 top-buffer">
+				{% if is_paginated %}
+					{% bootstrap_paginate page_obj range=5 show_prev_next="true" show_first_last="true" previous_label="Previous" next_label="Next" first_label="First" last_label="Last"%}
+				{% endif %}
+			</div>
+		</div>
+		{% endblock %}
+
+		{% block browsing_content %}{% endblock %}
+		
 	</div>
 {% endblock%}
 

@@ -1,0 +1,77 @@
+{% extends 'browsing/generic_browsing.html' %}
+
+{% load staticfiles %}
+
+{% block subtitle %} | View species {% endblock%}
+
+{% block page_title %}Viewing data for <i>{{ object.name }}</i> {% endblock%}
+
+{% block description_and_pagination %}
+{% endblock %}
+
+{% block browsing_content %}
+
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#sectionA">General info</a></li>
+        <li><a data-toggle="tab" href="#sectionB">Base composition</a></li>
+        <li><a data-toggle="tab" href="#sectionC">Codon usage</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="sectionA" class="tab-pane fade in active">
+
+          <br/>
+          <div class="col-md-4">
+		  <table class="table borderless">
+		    <tbody>
+		      <tr>
+		        <td>Scientific name</td>
+		        <td>{{ object.name }}</td>
+		      </tr>
+		      
+		      <tr>
+		        <td>Common name</td>
+		        <td>{% if object.common_name %}{{ object.common_name }}{% else %}<i>Not recorded</i>{% endif %}</td>
+		      </tr>
+		      {% if object.hagr_id %}
+		      <tr>
+		        <td>Lifespan@AnAge</td>
+		        <td>{% if object.lifespan %}{{ object.lifespan }} ({{ object.link_to_hagr|safe }}){% else %}<i>Not recorded</i> ({{ object.hagr_id }}){% endif %}</td>
+		      </tr>
+		      {% endif %}
+		    </tbody>
+		  </table>
+		  </div>
+  			
+    		
+    		
+    		
+
+
+        </div>
+        <div id="sectionB" class="tab-pane fade">
+
+        </div>
+        <div id="sectionC" class="tab-pane fade">
+
+        </div>
+    </div>
+
+
+	{% for taxonomy_order in object_list %}
+		<li>
+			{% if taxonomy_order.number_of_species != 0 %}
+				<a href="{% url 'browse_order' taxonomy_order.pk %}">{{ taxonomy_order.name }}</a>
+			{% else %} 
+				{{ taxonomy_order }}
+			{% endif %} 
+			({{taxonomy_order.number_of_species}})
+		</li>
+	{% endfor %}
+
+{% endblock %}
+
+
+
+
+
+

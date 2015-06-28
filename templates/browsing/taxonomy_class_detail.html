@@ -6,22 +6,27 @@
 
 {% block page_title %}Browsing class <i>{{ taxonomy_class.name }}</i> {% endblock%}
 
+{% block content_description %} 
+	<p>Class <b>{{ taxonomy_class.name }}</b> contains {{paginator.count}} taxonomic orders spanning {{taxonomy_class.number_of_species}} species.
+	You can either use the links <br/> below to browse through the orders, or you may view stats for the <a href="">entire class</a>.</p>
+{% endblock %}
+
 {% block browsing_content %}
 
-	<p>Class <b>{{ taxonomy_class.name }}</b> contains {{paginator.count}} taxonomic orders spanning {{taxonomy_class.number_of_species}} species.
-	You can either use the links below to browse through the orders, or you may view stats <br/>for the <a href="">entire class</a>.</p>
-	
-	{% for taxonomy_order in object_list %}
-		<li>
-			{% if taxonomy_order.number_of_species != 0 %}
-				<a href="{% url 'browse_order' taxonomy_order.pk %}">{{ taxonomy_order.name }}</a>
-			{% else %} 
-				{{ taxonomy_order }}
-			{% endif %} 
-			({{taxonomy_order.number_of_species}})
-		</li>
-	{% endfor %}
-
+	<div class="row">
+		{% for taxonomy_order in object_list %}
+			<div class="col-md-4">
+			<li>
+				{% if taxonomy_order.number_of_species != 0 %}
+					<a href="{% url 'browse_order' taxonomy_order.pk %}">{{ taxonomy_order.name }}</a>
+				{% else %} 
+					{{ taxonomy_order }}
+				{% endif %} 
+				({{taxonomy_order.number_of_species}})
+			</li>
+			</div>
+		{% endfor %}
+	</div>
 {% endblock %}
 
 

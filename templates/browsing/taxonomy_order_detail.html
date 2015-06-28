@@ -6,24 +6,26 @@
 
 {% block page_title %}Browsing order <i>{{ taxonomy_order.name }}</i> {% endblock%}
 
-{% block browsing_content %}
-
+{% block content_description %} 
 	<p>Order <b>{{ taxonomy_order.name }}</b> contains {{paginator.count}} taxonomic families spanning {{taxonomy_order.number_of_species}} species.
-	You can either use the links below to browse through the families, or you may view stats <br/>for the <a href="">entire order</a>.</p>
-	
-	{% for taxonomy_family in object_list %}
-		<li>
-			{% if taxonomy_family.number_of_species != 0 %}
-				<a href="{% url 'browse_family' taxonomy_family.pk %}">{{ taxonomy_family.name }}</a>
-			{% else %} 
-				{{ taxonomy_family }}
-			{% endif %} 
-			({{taxonomy_family.number_of_species}})
-		</li>
-	{% endfor %}
-
+	You can either use the links <br/>below to browse through the families, or you may view stats for the <a href="">entire order</a>.</p>
 {% endblock %}
 
+{% block browsing_content %}
 
+	<div class="row">
+		{% for taxonomy_family in object_list %}
+			<div class="col-md-4">
+			<li>
+				{% if taxonomy_family.number_of_species != 0 %}
+					<a href="{% url 'browse_family' taxonomy_family.pk %}">{{ taxonomy_family.name }}</a>
+				{% else %} 
+					{{ taxonomy_family }}
+				{% endif %} 
+				({{taxonomy_family.number_of_species}})
+			</li>
+			</div>
+		{% endfor %}
+	</div>
 
-
+{% endblock %}

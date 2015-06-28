@@ -6,19 +6,21 @@
 
 {% block page_title %}Browsing family <i>{{ taxonomy_family.name }}</i> {% endblock%}
 
-{% block browsing_content %}
-
-	<p>Family <b>{{ taxonomy_family.name }}</b> contains {{paginator.count}} species:
-	You can either use the links below to browse through the species, or you may view stats <br/>for the <a href="">entire family</a>.</p>
-	
-	{% for species in object_list %}
-		<li>
-			<a href="{% url 'view_species' species.pk %}">{{ species.name }}{% if species.common_name %} ({{species.common_name}}){% endif %}</a>
-		</li>
-	{% endfor %}
-
+{% block content_description %} 
+	<p>Family <b>{{ taxonomy_family.name }}</b> contains {{paginator.count}} species.
+	You can either use the links below to browse through the <br/>species, or you may view stats for the <a href="">entire family</a>.</p>
 {% endblock %}
 
+{% block browsing_content %}
 
+	<div class="row">
+		{% for species in object_list %}
+			<div class="col-md-4">
+			<li>
+				<a href="{% url 'view_species' species.pk %}">{{ species.name }}{% if species.common_name %} ({{species.common_name}}){% endif %}</a>
+			</li>
+			</div>
+		{% endfor %}
+	</div>
 
-
+{% endblock %}

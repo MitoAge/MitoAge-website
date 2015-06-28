@@ -35,3 +35,7 @@
 .large-image {
 	width: 100px;
 }
+
+.borderless td, .borderless th {
+    border: none !important; 
+}

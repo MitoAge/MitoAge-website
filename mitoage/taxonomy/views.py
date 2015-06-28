@@ -2,7 +2,8 @@ from django.core.urlresolvers import reverse_lazy
 from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.generic.list import ListView
 
-from mitoage.taxonomy.models import TaxonomyClass, TaxonomyOrder, TaxonomyFamily
+from mitoage.taxonomy.models import TaxonomyClass, TaxonomyOrder, TaxonomyFamily, \
+    TaxonomySpecies
 
 
 class SpeciesView(object):
@@ -30,7 +31,7 @@ class Breadcrumb():
 class BrowseAllClassesList(ListView):
     model = TaxonomyClass
     template_name = "browsing/taxonomy_class_list.html"
-    paginate_by = 20
+    paginate_by = 45
     
     def get_context_data(self, **kwargs):
         context = super(BrowseAllClassesList, self).get_context_data(**kwargs)
@@ -41,7 +42,7 @@ class BrowseAllClassesList(ListView):
 class TaxonomyClassDetail(SingleObjectMixin, ListView):
     template_name = "browsing/taxonomy_class_detail.html"
     model = TaxonomyClass
-    paginate_by = 5
+    paginate_by = 45
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=TaxonomyClass.objects.all())
@@ -60,7 +61,7 @@ class TaxonomyClassDetail(SingleObjectMixin, ListView):
 class TaxonomyOrderDetail(SingleObjectMixin, ListView):
     template_name = "browsing/taxonomy_order_detail.html"
     model = TaxonomyOrder
-    paginate_by = 5
+    paginate_by = 45
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=TaxonomyOrder.objects.all())
@@ -80,7 +81,7 @@ class TaxonomyOrderDetail(SingleObjectMixin, ListView):
 class TaxonomyFamilyDetail(SingleObjectMixin, ListView):
     template_name = "browsing/taxonomy_family_detail.html"
     model = TaxonomyFamily
-    paginate_by = 5
+    paginate_by = 45
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=TaxonomyFamily.objects.all())
@@ -97,3 +98,17 @@ class TaxonomyFamilyDetail(SingleObjectMixin, ListView):
 
     def get_queryset(self):
         return self.object.taxonomy_species.all()
+
+
+class TaxonomySpeciesDetail(DetailView):
+    template_name = "browsing/taxonomy_species_detail.html"
+    model = TaxonomySpecies
+
+    def get_context_data(self, **kwargs):
+        context = super(TaxonomySpeciesDetail, self).get_context_data(**kwargs)
+        context['breadcrumbs'] = [Breadcrumb("All taxonomic classes", "browse_taxonomy", None), 
+                                  Breadcrumb(self.object.taxonomy_family.taxonomy_order.taxonomy_class.name, "browse_class", self.object.taxonomy_family.taxonomy_order.taxonomy_class),
+                                  Breadcrumb(self.object.taxonomy_family.taxonomy_order.name, "browse_order", self.object.taxonomy_family.taxonomy_order),
+                                  Breadcrumb(self.object.taxonomy_family.name, "browse_family", self.object.taxonomy_family),
+                                  Breadcrumb(self.object.name, "", None),]
+        return context
