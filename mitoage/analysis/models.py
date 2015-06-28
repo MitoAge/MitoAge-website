@@ -13,7 +13,28 @@ class BaseComposition():
         self.others = others
 
     def g_1kb(self):
-        return self.g*1000/self.size
+        return round(self.g*1000.0/self.size,0) if self.g and self.size else None
+
+    def c_1kb(self):
+        return round(self.c*1000.0/self.size,0) if self.c and self.size else None
+
+    def a_1kb(self):
+        return round(self.a*1000.0/self.size,0) if self.a and self.size else None
+
+    def t_1kb(self):
+        return round(self.t*1000.0/self.size,0) if self.t and self.size else None
+
+    def gc_percent(self):
+        return round((self.g+self.c)*100.0/self.size,1) if self.g and self.c and self.size else None
+
+    def at_percent(self):
+        return round((self.a+self.t)*100.0/self.size,1) if self.a and self.t and self.size else None
+
+    def gc_1kb(self):
+        return round((self.g+self.c)*1000.0/self.size,0) if self.g and self.c and self.size else None
+
+    def at_1kb(self):
+        return round((self.a+self.t)*1000.0/self.size,0) if self.a and self.t and self.size else None
 
     def is_same(self, other):
         return self.size==other.size and self.g==other.g and self.c==other.c and self.a==other.a and self.t==other.t and self.others==other.others 
@@ -61,6 +82,25 @@ class CodonUsage(models.Model):
     @staticmethod
     def get_cu_sections():
         return ['total_pc_mtDNA', 'atp6', 'atp8', 'cox1', 'cox2', 'cox3', 'cytb', 'nd1', 'nd2', 'nd3', 'nd4', 'nd4l', 'nd5', 'nd6']
+
+    @staticmethod
+    def get_nice_title(key):
+        return {
+            'total_pc_mtDNA': "Protein-coding region of mtDNA",
+            'atp6': "Gene ATP6",
+            'atp8': "Gene ATP8",
+            'cox1': "Gene COX1",
+            'cox2': "Gene COX2",
+            'cox3': "Gene COX3",
+            'cytb': "Gene CYTB",
+            'nd1': "Gene ND1",
+            'nd2': "Gene ND2",
+            'nd3': "Gene ND3",
+            'nd4': "Gene ND4",
+            'nd4l': "Gene ND4L",
+            'nd5': "Gene ND5",
+            'nd6': "Gene ND6",
+        }.get(key, "No title")
 
     cu_protein_coding_entry = models.OneToOneField("MitoAgeEntry", related_name = "protein_coding_codon_usage", blank=True, null = True)
     cu_atp6_entry = models.OneToOneField("MitoAgeEntry", related_name = "atp6_codon_usage", blank=True, null = True)
@@ -216,6 +256,45 @@ class CodonUsage(models.Model):
 
     def same_values(self, other):
         return self.AUU == other.AUU and self.AUC == other.AUC and  self.AUA == other.AUA and  self.CUU == other.CUU and self.CUC == other.CUC and self.CUA == other.CUA and self.CUG == other.CUG and self.UUA == other.UUA and self.CAA == other.CAA and self.CAG == other.CAG and self.GUU == other.GUU and self.GUC == other.GUC and self.GUA == other.GUA and self.GUG == other.GUG and self.UUU == other.UUU and self.UUC == other.UUC and self.AUG == other.AUG and self.UGU == other.UGU and self.UGC == other.UGC and self.GCU == other.GCU and self.GCC == other.GCC and self.GCA == other.GCA and self.GCG == other.GCG and self.GGU == other.GGU and self.GGC == other.GGC and self.GGA == other.GGA and self.GGG == other.GGG and self.CCU == other.CCU and self.CCC == other.CCC and self.CCA == other.CCA and self.CCG == other.CCG and self.ACU == other.ACU and self.ACC == other.ACC and self.ACA == other.ACA and self.ACG == other.ACG and self.UCU == other.UCU and self.UCC == other.UCC and self.UCA == other.UCA and self.UCG == other.UCG and self.AGU == other.AGU and self.AGC == other.AGC and self.UAU == other.UAU and self.UAC == other.UAC and self.UGG == other.UGG and self.UUG == other.UUG and self.AAU == other.AAU and self.AAC == other.AAC and self.CAU == other.CAU and self.CAC == other.CAC and self.GAA == other.GAA and self.GAG == other.GAG and self.GAU == other.GAU and self.GAC == other.GAC and self.AAA == other.AAA and self.AAG == other.AAG and self.CGU == other.CGU and self.CGC == other.CGC and self.CGA == other.CGA and self.CGG == other.CGG and self.AGA == other.AGA and self.AGG == other.AGG and self.STOP_UAA == other.STOP_UAA and self.STOP_UAG == other.STOP_UAG and self.STOP_UGA == other.STOP_UGA and self.aa==other.aa and self.size==other.size
+
+    def codons_1st_g(self):
+        return self.GAA + self.GAC + self.GAG + self.GAU + self.GCA + self.GCC + self.GCG + self.GCU + self.GGA + self.GGC + self.GGG + self.GGU + self.GUA + self.GUC + self.GUG + self.GUU
+
+    def codons_1st_c(self):
+        return self.CAA + self.CAC + self.CAG + self.CAU + self.CCA + self.CCC + self.CCG + self.CCU + self.CGA + self.CGC + self.CGG + self.CGU + self.CUA + self.CUC + self.CUG + self.CUU
+
+    def codons_1st_a(self):
+        return self.AAA + self.AAC + self.AAG + self.AAU + self.ACA + self.ACC + self.ACG + self.ACU + self.AGA + self.AGC + self.AGG + self.AGU + self.AUA + self.AUC + self.AUG + self.AUU
+
+    def codons_1st_u(self):
+        return self.UAC + self.UAU + self.STOP_UAA + self.STOP_UAG + self.UCA + self.UCC + self.UCG + self.UCU + self.UGC + self.UGG + self.UGU + self.STOP_UGA + self.UUA + self.UUC + self.UUG + self.UUU
+
+
+    def codons_2nd_g(self):
+        return self.AGA + self.AGC + self.AGG + self.AGU + self.CGA + self.CGC + self.CGG + self.CGU + self.GGA + self.GGC + self.GGG + self.GGU + self.STOP_UGA + self.UGC + self.UGG + self.UGU
+
+    def codons_2nd_c(self):
+        return self.ACA + self.ACC + self.ACG + self.ACU + self.CCA + self.CCC + self.CCG + self.CCU + self.GCA + self.GCC + self.GCG + self.GCU + self.UCA + self.UCC + self.UCG + self.UCU
+
+    def codons_2nd_a(self):
+        return self.AAA + self.AAC + self.AAG + self.AAU + self.CAA + self.CAC + self.CAG + self.CAU + self.GAA + self.GAC + self.GAG + self.GAU + self.STOP_UAA + self.UAC + self.STOP_UAG + self.UAU
+
+    def codons_2nd_u(self):
+        return self.AUC + self.AUU + self.CUA + self.CUC + self.CUG + self.CUU + self.GUC + self.GUG + self.GUU + self.AUA + self.AUG + self.GUA  + self.UUA + self.UUC + self.UUG + self.UUU
+
+
+    def codons_3rd_g(self):
+        return self.AAG + self.ACG + self.AGG + self.AUG + self.CAG + self.CCG + self.CGG + self.CUG + self.GAG + self.GCG + self.GGG + self.GUG + self.STOP_UAG + self.UCG + self.UGG + self.UUG
+
+    def codons_3rd_c(self):
+        return self.AAC + self.ACC + self.AGC + self.AUC + self.CAC + self.CCC + self.CGC + self.CUC + self.GAC + self.GCC + self.GGC + self.GUC + self.UAC + self.UCC + self.UGC + self.UUC
+
+    def codons_3rd_a(self):
+        return self.AAA + self.ACA + self.AGA + self.AUA + self.CAA + self.CCA + self.CGA + self.CUA + self.GAA + self.GCA + self.GGA + self.GUA + self.STOP_UAA + self.UCA + self.STOP_UGA + self.UUA
+
+    def codons_3rd_u(self):
+        return self.ACU + self.AUU + self.CAU + self.CCU + self.CGU + self.CUU + self.GCU + self.GGU + self.GUU + self.AAU + self.AGU + self.GAU  + self.UAU + self.UCU + self.UGU + self.UUU
+
 
 class MitoAgeEntry(models.Model):
     class Meta:
@@ -383,6 +462,9 @@ class MitoAgeEntry(models.Model):
 
     def get_base_compositions_as_dictionaries(self):
         return {key: self.get_base_composition(key) for key in BaseComposition.get_bc_sections()}
+
+    def get_codon_usages_as_dictionaries(self):
+        return {key: self.get_codon_usage(key) for key in CodonUsage.get_cu_sections()}
 
     def get_base_composition(self, type_of_bc):
         return {

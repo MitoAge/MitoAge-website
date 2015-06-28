@@ -2,9 +2,9 @@ from django.core.urlresolvers import reverse_lazy
 from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.generic.list import ListView
 
+from mitoage.analysis.models import MitoAgeEntry, BaseComposition, CodonUsage
 from mitoage.taxonomy.models import TaxonomyClass, TaxonomyOrder, TaxonomyFamily, \
     TaxonomySpecies
-from mitoage.analysis.models import MitoAgeEntry
 
 
 class SpeciesView(object):
@@ -113,6 +113,10 @@ class TaxonomySpeciesDetail(DetailView):
                                   Breadcrumb(self.object.taxonomy_family.name, "browse_family", self.object.taxonomy_family),
                                   Breadcrumb(self.object.name, "", None),]
         context['base_compositions'] = self.get_base_compositions(self.object)
+        context['general_sections'] = ["total_mtDNA", "total_pc_mtDNA", "d_loop_mtDNA", "total_rRNA_mtDNA", "rRNA_12S", "rRNA_16S"]
+        context['gene_sections'] = ['atp6', 'atp8', 'cox1', 'cox2', 'cox3', 'cytb', 'nd1', 'nd2', 'nd3', 'nd4', 'nd4l', 'nd5', 'nd6']
+        context['codon_usages'] = self.get_codon_usages(self.object)
+        context['codon_usage_sections'] = ['total_pc_mtDNA', 'atp6', 'atp8', 'cox1', 'cox2', 'cox3', 'cytb', 'nd1', 'nd2', 'nd3', 'nd4', 'nd4l', 'nd5', 'nd6']
         return context
 
     def get_base_compositions(self, species):
@@ -120,7 +124,11 @@ class TaxonomySpeciesDetail(DetailView):
             mitoage_entry = species.mitoage_entries.first()
             return mitoage_entry.get_base_compositions_as_dictionaries()
         except MitoAgeEntry.DoesNotExist:
-            return {'total_mtDNA': None, 'total_pc_mtDNA': None, 'd_loop_mtDNA': None, 'total_rRNA_mtDNA': None, 'atp6': None, 'atp8': None,
-            'cox1': None, 'cox2': None, 'cox3': None, 'cytb': None, 'nd1': None, 'nd2': None, 'nd3': None, 'nd4': None, 'nd4l': None,
-            'nd5': None, 'nd6': None, 'rRNA_12S': None, 'rRNA_16S': None}
+            return {key: None for key in BaseComposition.get_bc_sections()}
 
+    def get_codon_usages(self, species):
+        try:
+            mitoage_entry = species.mitoage_entries.first()
+            return mitoage_entry.get_codon_usages_as_dictionaries()
+        except MitoAgeEntry.DoesNotExist:
+            return {key: None for key in CodonUsage.get_cu_sections()}

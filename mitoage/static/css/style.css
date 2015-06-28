@@ -36,6 +36,10 @@
 	width: 100px;
 }
 
-.borderless td, .borderless th {
-    border: none !important; 
+.borderless1 table {
+    margin-bottom: 0px !important; 
 }
+.borderless td, .borderless th {
+    border: none !important;
+}
+

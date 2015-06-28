@@ -1,0 +1,197 @@
+{% load staticfiles %}
+
+{% load templatetags_extra %}
+
+<table class="table">
+	<thead>
+		<tr>
+			<th colspan="16">{{section|codon_usage_nice_title}} (size: {{codon_usage.size}} bases)</th>
+		</tr>
+	</thead>
+	
+	<tbody>
+		<tr>
+			<td colspan="16" style="word-break:break-all;"><b>Amino acid sequence:</b> {{codon_usage.aa|safe}}</td>
+		</tr>
+		<tr>
+		    <td class="text-center"><b>AUU</b></td>
+		    <td class="text-center"><b>AUC</b></td>
+		    <td class="text-center"><b>AUA</b></td>
+		    <td class="text-center"><b>CUU</b></td>
+		    <td class="text-center"><b>CUC</b></td>
+		    <td class="text-center"><b>CUA</b></td>
+		    <td class="text-center"><b>CUG</b></td>
+		    <td class="text-center"><b>UUA</b></td>
+		    <td class="text-center"><b>CAA</b></td>
+		    <td class="text-center"><b>CAG</b></td>
+		    <td class="text-center"><b>GUU</b></td>
+		    <td class="text-center"><b>GUC</b></td>
+		    <td class="text-center"><b>GUA</b></td>
+		    <td class="text-center"><b>GUG</b></td>
+		    <td class="text-center"><b>UUU</b></td>
+		    <td class="text-center"><b>UUC</b></td>
+		</tr>
+		<tr>
+		    <td class="text-center">{{codon_usage.AUU}}</td>
+		    <td class="text-center">{{codon_usage.AUC}}</td>
+		    <td class="text-center">{{codon_usage.AUA}}</td>
+		    <td class="text-center">{{codon_usage.CUU}}</td>
+		    <td class="text-center">{{codon_usage.CUC}}</td>
+		    <td class="text-center">{{codon_usage.CUA}}</td>
+		    <td class="text-center">{{codon_usage.CUG}}</td>
+		    <td class="text-center">{{codon_usage.UUA}}</td>
+		    <td class="text-center">{{codon_usage.CAA}}</td>
+		    <td class="text-center">{{codon_usage.CAG}}</td>
+		    <td class="text-center">{{codon_usage.GUU}}</td>
+		    <td class="text-center">{{codon_usage.GUC}}</td>
+		    <td class="text-center">{{codon_usage.GUA}}</td>
+		    <td class="text-center">{{codon_usage.GUG}}</td>
+		    <td class="text-center">{{codon_usage.UUU}}</td>
+		    <td class="text-center">{{codon_usage.UUC}}</td>
+		</tr>
+		<tr>
+		    <td class="text-center"><b>AUG</b></td>
+		    <td class="text-center"><b>UGU</b></td>
+		    <td class="text-center"><b>UGC</b></td>
+		    <td class="text-center"><b>GCU</b></td>
+		    <td class="text-center"><b>GCC</b></td>
+		    <td class="text-center"><b>GCA</b></td>
+		    <td class="text-center"><b>GCG</b></td>
+		    <td class="text-center"><b>GGU</b></td>
+		    <td class="text-center"><b>GGC</b></td>
+		    <td class="text-center"><b>GGA</b></td>
+		    <td class="text-center"><b>GGG</b></td>
+		    <td class="text-center"><b>CCU</b></td>
+		    <td class="text-center"><b>CCC</b></td>
+		    <td class="text-center"><b>CCA</b></td>
+		    <td class="text-center"><b>CCG</b></td>
+		    <td class="text-center"><b>ACU</b></td>
+		</tr>
+		<tr>
+		    <td class="text-center">{{codon_usage.AUG}}</td>
+		    <td class="text-center">{{codon_usage.UGU}}</td>
+		    <td class="text-center">{{codon_usage.UGC}}</td>
+		    <td class="text-center">{{codon_usage.GCU}}</td>
+		    <td class="text-center">{{codon_usage.GCC}}</td>
+		    <td class="text-center">{{codon_usage.GCA}}</td>
+		    <td class="text-center">{{codon_usage.GCG}}</td>
+		    <td class="text-center">{{codon_usage.GGU}}</td>
+		    <td class="text-center">{{codon_usage.GGC}}</td>
+		    <td class="text-center">{{codon_usage.GGA}}</td>
+		    <td class="text-center">{{codon_usage.GGG}}</td>
+		    <td class="text-center">{{codon_usage.CCU}}</td>
+		    <td class="text-center">{{codon_usage.CCC}}</td>
+		    <td class="text-center">{{codon_usage.CCA}}</td>
+		    <td class="text-center">{{codon_usage.CCG}}</td>
+		    <td class="text-center">{{codon_usage.ACU}}</td>
+		</tr>
+		<tr>
+		    <td class="text-center"><b>ACC</b></td>
+		    <td class="text-center"><b>ACA</b></td>
+		    <td class="text-center"><b>ACG</b></td>
+		    <td class="text-center"><b>UCU</b></td>
+		    <td class="text-center"><b>UCC</b></td>
+		    <td class="text-center"><b>UCA</b></td>
+		    <td class="text-center"><b>UCG</b></td>
+		    <td class="text-center"><b>AGU</b></td>
+		    <td class="text-center"><b>AGC</b></td>
+		    <td class="text-center"><b>UAU</b></td>
+		    <td class="text-center"><b>UAC</b></td>
+		    <td class="text-center"><b>UGG</b></td>
+		    <td class="text-center"><b>UUG</b></td>
+		    <td class="text-center"><b>AAU</b></td>
+		    <td class="text-center"><b>AAC</b></td>
+		    <td class="text-center"><b>CAU</b></td>
+		</tr>
+		<tr>
+		    <td class="text-center">{{codon_usage.ACC}}</td>
+		    <td class="text-center">{{codon_usage.ACA}}</td>
+		    <td class="text-center">{{codon_usage.ACG}}</td>
+		    <td class="text-center">{{codon_usage.UCU}}</td>
+		    <td class="text-center">{{codon_usage.UCC}}</td>
+		    <td class="text-center">{{codon_usage.UCA}}</td>
+		    <td class="text-center">{{codon_usage.UCG}}</td>
+		    <td class="text-center">{{codon_usage.AGU}}</td>
+		    <td class="text-center">{{codon_usage.AGC}}</td>
+		    <td class="text-center">{{codon_usage.UAU}}</td>
+		    <td class="text-center">{{codon_usage.UAC}}</td>
+		    <td class="text-center">{{codon_usage.UGG}}</td>
+		    <td class="text-center">{{codon_usage.UUG}}</td>
+		    <td class="text-center">{{codon_usage.AAU}}</td>
+		    <td class="text-center">{{codon_usage.AAC}}</td>
+		    <td class="text-center">{{codon_usage.CAU}}</td>
+		</tr>
+		<tr>
+		    <td class="text-center"><b>CAC</b></td>
+		    <td class="text-center"><b>GAA</b></td>
+		    <td class="text-center"><b>GAG</b></td>
+		    <td class="text-center"><b>GAU</b></td>
+		    <td class="text-center"><b>GAC</b></td>
+		    <td class="text-center"><b>AAA</b></td>
+		    <td class="text-center"><b>AAG</b></td>
+		    <td class="text-center"><b>CGU</b></td>
+		    <td class="text-center"><b>CGC</b></td>
+		    <td class="text-center"><b>CGA</b></td>
+		    <td class="text-center"><b>CGG</b></td>
+		    <td class="text-center"><b>AGA</b></td>
+		    <td class="text-center"><b>AGG</b></td>
+		    <td class="text-center"><b>UAA</b></td>
+		    <td class="text-center"><b>UAG</b></td>
+		    <td class="text-center"><b>UGA</b></td>
+		</tr>
+		<tr>
+		    <td class="text-center">{{codon_usage.CAC}}</td>
+		    <td class="text-center">{{codon_usage.GAA}}</td>
+		    <td class="text-center">{{codon_usage.GAG}}</td>
+		    <td class="text-center">{{codon_usage.GAU}}</td>
+		    <td class="text-center">{{codon_usage.GAC}}</td>
+		    <td class="text-center">{{codon_usage.AAA}}</td>
+		    <td class="text-center">{{codon_usage.AAG}}</td>
+		    <td class="text-center">{{codon_usage.CGU}}</td>
+		    <td class="text-center">{{codon_usage.CGC}}</td>
+		    <td class="text-center">{{codon_usage.CGA}}</td>
+		    <td class="text-center">{{codon_usage.CGG}}</td>
+		    <td class="text-center">{{codon_usage.AGA}}</td>
+		    <td class="text-center">{{codon_usage.AGG}}</td>
+		    <td class="text-center">{{codon_usage.STOP_UAA}}</td>
+		    <td class="text-center">{{codon_usage.STOP_UAG}}</td>
+		    <td class="text-center">{{codon_usage.STOP_UGA}}</td>
+		</tr>
+		<tr>
+		    <td colspan="4" class="text-center"><b>Codons with 1st base G</b></td>
+		    <td colspan="4" class="text-center"><b>Codons with 1st base C</b></td>
+		    <td colspan="4" class="text-center"><b>Codons with 1st base A</b></td>
+		    <td colspan="4" class="text-center"><b>Codons with 1st base U</b></td>
+		</tr>
+		<tr>
+		    <td colspan="4" class="text-center">{{codon_usage.codons_1st_g}}</td>
+		    <td colspan="4" class="text-center">{{codon_usage.codons_1st_c}}</td>
+		    <td colspan="4" class="text-center">{{codon_usage.codons_1st_a}}</td>
+		    <td colspan="4" class="text-center">{{codon_usage.codons_1st_u}}</td>
+		</tr>
+		<tr>
+		    <td colspan="4" class="text-center"><b>Codons with 2nd base G</b></td>
+		    <td colspan="4" class="text-center"><b>Codons with 2nd base C</b></td>
+		    <td colspan="4" class="text-center"><b>Codons with 2nd base A</b></td>
+		    <td colspan="4" class="text-center"><b>Codons with 2nd base U</b></td>
+		</tr>
+		<tr>
+		    <td colspan="4" class="text-center">{{codon_usage.codons_2nd_g}}</td>
+		    <td colspan="4" class="text-center">{{codon_usage.codons_2nd_c}}</td>
+		    <td colspan="4" class="text-center">{{codon_usage.codons_2nd_a}}</td>
+		    <td colspan="4" class="text-center">{{codon_usage.codons_2nd_u}}</td>
+		</tr>
+		<tr>
+		    <td colspan="4" class="text-center"><b>Codons with 3rd base G</b></td>
+		    <td colspan="4" class="text-center"><b>Codons with 3rd base C</b></td>
+		    <td colspan="4" class="text-center"><b>Codons with 3rd base A</b></td>
+		    <td colspan="4" class="text-center"><b>Codons with 3rd base U</b></td>
+		</tr>
+		<tr>
+		    <td colspan="4" class="text-center">{{codon_usage.codons_3rd_g}}</td>
+		    <td colspan="4" class="text-center">{{codon_usage.codons_3rd_c}}</td>
+		    <td colspan="4" class="text-center">{{codon_usage.codons_3rd_a}}</td>
+		    <td colspan="4" class="text-center">{{codon_usage.codons_3rd_u}}</td>
+		</tr>
+	</tbody>
+</table>

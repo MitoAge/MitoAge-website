@@ -1,0 +1,46 @@
+{% load staticfiles %}
+
+{% load templatetags_extra %}
+
+<table class="table">
+	<thead>
+		<tr>
+			<th width="350px">{{section|base_composition_nice_title}} (size: {{base_composition.size}} bases)</th>
+			<th class="text-center">G</th>
+			<th class="text-center">C</th>
+			<th class="text-center">A</th>
+			<th class="text-center">T</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Base composition</td>
+			<td class="text-center">{{base_composition.g}}</td>
+			<td class="text-center">{{base_composition.c}}</td>
+			<td class="text-center">{{base_composition.a}}</td>
+			<td class="text-center">{{base_composition.t}}</td>
+		</tr>
+		<tr>
+			<td>Composition per 1kb</td>
+			<td class="text-center">{{base_composition.g_1kb| stringformat:'d'}}</td>
+			<td class="text-center">{{base_composition.c_1kb| stringformat:'d'}}</td>
+			<td class="text-center">{{base_composition.a_1kb| stringformat:'d'}}</td>
+			<td class="text-center">{{base_composition.t_1kb| stringformat:'d'}}</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td colspan="2" class="text-center"><b>GC</b></td>
+			<td colspan="2" class="text-center"><b>AT</b></td>
+		</tr>
+		<tr>
+			<td>GC/AT composition (%)</td>
+			<td colspan="2" class="text-center">{{base_composition.gc_percent| stringformat:'.1f'}}%</td>
+			<td colspan="2" class="text-center">{{base_composition.at_percent| stringformat:'.1f'}}%</td>
+		</tr>
+		<tr>
+			<td>GC/AT per 1kb</td>
+			<td colspan="2" class="text-center">{{base_composition.gc_1kb| stringformat:'d'}}</td>
+			<td colspan="2" class="text-center">{{base_composition.at_1kb| stringformat:'d'}}</td>
+		</tr>
+	</tbody>
+</table>
