@@ -1,6 +1,6 @@
 {% load staticfiles %}
 
-<form class="navbar-form navbar-left" role="search" action="/search" method="get">
+<form class="navbar-form navbar-left" role="search" action="{% url 'search' %}" method="get">
 	<div class="form-group search">
 		<input type="text" class="form-control" placeholder="Search" name="q">
 	</div>

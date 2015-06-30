@@ -3,7 +3,7 @@ from django.conf.urls import patterns, url
 from django.views.generic.base import TemplateView
 
 from mitoage.taxonomy.views import BrowseAllClassesList, TaxonomyClassDetail, \
-    TaxonomyOrderDetail, TaxonomyFamilyDetail, TaxonomySpeciesDetail
+    TaxonomyOrderDetail, TaxonomyFamilyDetail, TaxonomySpeciesDetail, search
 
 
 urlpatterns = patterns('mitoage.taxonomy.views',
@@ -16,4 +16,7 @@ urlpatterns = patterns('mitoage.taxonomy.views',
 
     url(r'^browse/genes/$', TemplateView.as_view(template_name="static_pages/home.html"), name='browse_genes'),
     url(r'^view/(?P<gene>[\w]+)/gene/$', TemplateView.as_view(template_name="static_pages/home.html"), name='view_gene'),
+    
+    url(r'^search/$', search, name='search'),
+    
 )

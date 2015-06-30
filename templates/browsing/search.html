@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+{% load bootstrap_pagination %}
+
+{% block subtitle %} | Search results {% endblock%}
+
+{% block content %}
+	<div class="container">
+		<h1>Searching for: <i>{{ query_string }}</i></h1>
+		<hr/>
+
+		<div class="row">
+			{% if all_entries %}
+				{% for species in all_entries %}
+					<div class="col-md-6">
+					<li>
+						<a href="{% url 'view_species' species.pk %}">{{ species.name }}{% if species.common_name %} ({{species.common_name}}){% endif %}</a>
+					</li>
+					</div>
+				{% endfor %}
+			{% else %}
+				Sorry. Your search did not return any results. 
+			{% endif %}
+		</div>
+		
+		{% if is_paginated %}
+		<div class="row">		
+			<div class="col-md-5 top-buffer">
+				{% bootstrap_paginate found_entries range=5 show_prev_next="true" show_first_last="true" previous_label="Previous" next_label="Next" first_label="First" last_label="Last"%}
+			</div>
+		</div>
+		{% endif %}
+		
+	</div>
+{% endblock%}

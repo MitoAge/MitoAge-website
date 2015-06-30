@@ -1,10 +1,15 @@
+from django.core.context_processors import request
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.core.urlresolvers import reverse_lazy
+from django.shortcuts import render_to_response
+from django.template.context import RequestContext
 from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.generic.list import ListView
 
 from mitoage.analysis.models import MitoAgeEntry, BaseComposition, CodonUsage
 from mitoage.taxonomy.models import TaxonomyClass, TaxonomyOrder, TaxonomyFamily, \
     TaxonomySpecies
+from mitoage.taxonomy.utils import get_query
 
 
 class SpeciesView(object):
@@ -132,3 +137,26 @@ class TaxonomySpeciesDetail(DetailView):
             return mitoage_entry.get_codon_usages_as_dictionaries()
         except MitoAgeEntry.DoesNotExist:
             return {key: None for key in CodonUsage.get_cu_sections()}
+
+def search(request):
+    query_string = ''
+    found_entries = None
+
+    if ('q' in request.GET) and request.GET['q'].strip():
+        query_string = request.GET['q']
+        entry_query = get_query(query_string, ['name', 'common_name',])
+        all_entries = TaxonomySpecies.objects.filter(entry_query).order_by('name')
+
+    paginator = Paginator(all_entries, 10)
+    page = request.GET.get('page')
+    try:
+        found_entries = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        found_entries = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        found_entries = paginator.page(paginator.num_pages)
+
+    #return render_to_response('browsing/search.html', { 'query_string': query_string, 'found_entries': found_entries }, RequestContext(request))
+    return render_to_response('browsing/search.html', locals(), RequestContext(request))
