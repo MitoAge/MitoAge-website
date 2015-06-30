@@ -65,10 +65,39 @@ class TaxonomyFamilyAdmin(ModelAdmin):
     displayed_class.allow_tags = True
 
 
+
+from django.contrib.admin.filters import SimpleListFilter
+
+class NullFilterSpec(SimpleListFilter):
+    title = u''
+    parameter_name = u''
+
+    def lookups(self, request, model_admin):
+        return (
+            ('1', 'set', ),
+            ('0', 'unset', ),
+        )
+
+    def queryset(self, request, queryset):
+        kwargs = {'%s'%self.parameter_name : None,}
+        if self.value() == '0':
+            return queryset.filter(**kwargs)
+        if self.value() == '1':
+            return queryset.exclude(**kwargs)
+        return queryset
+
+class LifespanNullFilterSpec(NullFilterSpec):
+    title = u'Lifespan'
+    parameter_name = u'lifespan'
+
+class HAGRIDNullFilterSpec(NullFilterSpec):
+    title = u'HAGR ID'
+    parameter_name = u'hagr_id'
+
 ################################### Species admin ###################################
 class TaxonomySpeciesAdmin(ModelAdmin):
     list_display = ('displayed_species', 'displayed_common_name', 'displayed_family', 'displayed_order', 'displayed_class')
-    list_filter = ('taxonomy_family__name', 'taxonomy_family__taxonomy_order__name', 'taxonomy_family__taxonomy_order__taxonomy_class__name', )
+    list_filter = ('taxonomy_family__name', 'taxonomy_family__taxonomy_order__name', 'taxonomy_family__taxonomy_order__taxonomy_class__name', LifespanNullFilterSpec, HAGRIDNullFilterSpec)
     search_fields = ('name', )
 
     # adding to list_display 'lifespan' results in messing css code

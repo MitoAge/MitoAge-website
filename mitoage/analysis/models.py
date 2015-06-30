@@ -1,7 +1,55 @@
 from django.db import models
 
 from mitoage.taxonomy.models import TaxonomySpecies
+import math
 
+def median(lst):
+    lst = sorted(lst)
+    if len(lst) < 1:
+        return None
+    if len(lst) %2 == 1:
+        return lst[((len(lst)+1)/2)-1]
+    else:
+        return float(sum(lst[(len(lst)/2)-1:(len(lst)/2)+1]))/2.0
+
+def average(lst):
+    return sum(list)*1.0/len(lst)
+
+def stdev(lst):
+    avg = average(lst)
+    variance = map(lambda x: (x - avg)**2, lst)
+    return math.sqrt(average(variance))
+
+class BaseCompositionStats():
+    def __init__(self, species, section):
+        self.section = section
+        
+        compositions = [a_species.get_base_composition(section) for a_species in species if a_species is not None]
+        # prep all the lists
+        self.g = [entry.g for entry in compositions]
+        self.c = [entry.c for entry in compositions]
+        self.a = [entry.a for entry in compositions]
+        self.t = [entry.t for entry in compositions]
+
+        self.g_1kb = [entry.g_1kb() for entry in compositions]
+        self.c_1kb = [entry.c_1kb() for entry in compositions]
+        self.a_1kb = [entry.a_1kb() for entry in compositions]
+        self.t_1kb = [entry.t_1kb() for entry in compositions]
+
+        self.gc = [entry.gc_percent() for entry in compositions]
+        self.at = [entry.at_percent() for entry in compositions]
+
+        # compute simple stats for all the lists
+        self.min = { "g":min(self.g), "c":min(self.c), "a":min(self.a), "t":min(self.t), "g_1kb":min(self.g_1kb), "c_1kb":min(self.c_1kb), "a_1kb":min(self.a_1kb), "t_1kb":min(self.t_1kb), "gc":min(self.gc), "at":min(self.at)} 
+        self.max = { "g":max(self.g), "c":max(self.c), "a":max(self.a), "t":max(self.t), "g_1kb":max(self.g_1kb), "c_1kb":max(self.c_1kb), "a_1kb":max(self.a_1kb), "t_1kb":max(self.t_1kb), "gc":max(self.gc), "at":max(self.at)} 
+        self.mean = { "g":average(self.g), "c":average(self.c), "a":average(self.a), "t":average(self.t), "g_1kb":average(self.g_1kb), "c_1kb":average(self.c_1kb), "a_1kb":average(self.a_1kb), "t_1kb":average(self.t_1kb), "gc":average(self.gc), "at":average(self.at)} 
+        self.stdev = { "g":stdev(self.g), "c":stdev(self.c), "a":stdev(self.a), "t":stdev(self.t), "g_1kb":stdev(self.g_1kb), "c_1kb":stdev(self.c_1kb), "a_1kb":stdev(self.a_1kb), "t_1kb":stdev(self.t_1kb), "gc":stdev(self.gc), "at":stdev(self.at)} 
+        self.median = { "g":median(self.g), "c":median(self.c), "a":median(self.a), "t":median(self.t), "g_1kb":median(self.g_1kb), "c_1kb":median(self.c_1kb), "a_1kb":median(self.a_1kb), "t_1kb":median(self.t_1kb), "gc":median(self.gc), "at":median(self.at)} 
+
+        lifespans = [a_species.lifespan for a_species in species if a_species is not None]
+        # compute correlations here
+         
+        
 
 class BaseComposition():
     def __init__(self, size, g, c, a, t, others):
@@ -11,6 +59,12 @@ class BaseComposition():
         self.a = a
         self.t = t
         self.others = others
+
+    def gc(self):
+        return self.g + self.c
+
+    def at(self):
+        return self.a + self.t
 
     def g_1kb(self):
         return round(self.g*1000.0/self.size,0) if self.g and self.size else None
@@ -56,9 +110,9 @@ class BaseComposition():
     def get_nice_title(key):
         return {
             'total_mtDNA': "Total mtDNA",
-            'total_pc_mtDNA': "Protein-coding region of mtDNA",
-            'd_loop_mtDNA': "D-loop region of mtDNA",
-            'total_rRNA_mtDNA': "Total rRNA-coding region of mtDNA",
+            'total_pc_mtDNA': "Protein-coding region",
+            'd_loop_mtDNA': "D-loop region",
+            'total_rRNA_mtDNA': "Total rRNA-coding region",
             'atp6': "Gene ATP6",
             'atp8': "Gene ATP8",
             'cox1': "Gene COX1",

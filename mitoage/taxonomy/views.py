@@ -127,16 +127,20 @@ class TaxonomySpeciesDetail(DetailView):
     def get_base_compositions(self, species):
         try:
             mitoage_entry = species.mitoage_entries.first()
-            return mitoage_entry.get_base_compositions_as_dictionaries()
+            if mitoage_entry:
+                return mitoage_entry.get_base_compositions_as_dictionaries()
         except MitoAgeEntry.DoesNotExist:
-            return {key: None for key in BaseComposition.get_bc_sections()}
+            pass
+        return {key: None for key in BaseComposition.get_bc_sections()}
 
     def get_codon_usages(self, species):
         try:
             mitoage_entry = species.mitoage_entries.first()
-            return mitoage_entry.get_codon_usages_as_dictionaries()
+            if mitoage_entry:
+                return mitoage_entry.get_codon_usages_as_dictionaries()
         except MitoAgeEntry.DoesNotExist:
-            return {key: None for key in CodonUsage.get_cu_sections()}
+            pass
+        return {key: None for key in CodonUsage.get_cu_sections()}
 
 def search(request):
     query_string = ''
