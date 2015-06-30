@@ -1,0 +1,27 @@
+{% extends 'browsing/generic_browsing.html' %}
+
+{% load staticfiles %}
+
+{% block subtitle %} | Stats for species {% endblock%}
+
+{% block page_title %} {{ title }} {% endblock%}
+
+{% block content_description %} 
+	<p>Stats description ----- <b>{{ taxonomy_family.name }}</b> contains {{paginator.count}} species.
+	You can either use the links below to browse through the <br/>species, or you may 
+	</p>
+{% endblock %}
+
+{% block browsing_content %}
+
+	<div class="row">
+		{% for entry in object_list %}
+			<div class="col-md-4">
+			<li>
+				<a href="{% url 'stats' entry.pk 'class' %}"> {{ entry.name }} </a>
+			</li>
+			</div>
+		{% endfor %}
+	</div>
+
+{% endblock %}

@@ -14,26 +14,31 @@
 		<br/>
 		<li> Statistics - aggregation <br/> </li> 
 		<br/>
+		<li> Consider making taxonomy more flexible - to include more fields (but keep in mind that flattening it comes with some disadvantages) <br/> </li> 
+		<br/>
+		<li> Consider making a spin-off project to predict maximum lifespan (check if a inter-lab grant can be obtained = main question why it would be useful?) <br/> </li> 
+		<br/>
 	</div>
 
-
-	<div class="module" >
-		<div class="alert alert-info" role="info">
-
-			<h4>"Uploadable" files:</h4>
-    		<br/>
-		
-			<li> 1) file - [5 Columns] Taxonomy: Species, Family, Order, Class, Common name.<br/></li> 
-			<li> 2) file - [3 Columns]: Species, Lifespan, HAGRID<br/></li> 
-			<li> 3) format for each BC file [7 Columns] -  Species, G, C, A, T, Others, mtDNA size<br/></li> 
-			<li> 4) format for each codon file [ many Columns] - Species, Amino Acids, AUU - STOP Codons<br/></li> 
-			<li> 5) additional info file [3-5? Columns] BC total: gi, Ref, Species, length non-coding (bp)? length non-coding without D-Loop (bp)? [+2?]<br/></li> 
-			<br/><br/>
-			
-			<li> 3) BC files: 4 total files, 13 genes + 2 rrna + d-loop<br/></li> 
-			<li> 4) codon files: 13 genes + 1 for total<br/></li> 
-
-        </div>
-    </div>
+	<div class="alert alert-info" role="info">
+		<h4>ToDO now:</h4>
+		<br/>
+		<li> Stats taxonomy browsing<br/> </li> 
+		<br/>
+		<li> Stats display panels<br/> </li> 
+		<br/>
+		<li> Genes browsing<br/> </li> 
+		<br/>
+		<li> Download page<br/> </li> 
+		<br/>
+		<li> Statistics<br/> </li> 
+		<br/>
+		<li> Maybe move computation for per 1kb and % to a template tag? More generic like that...<br/> </li> 
+		<br/>
+		<li> To finish pagination in search<br/> </li> 
+		<br/>
+		<li> Extend breadcrumbs to include stat navigation<br/> </li> 
+		<br/>
+	</div>
 
 {% endblock %}

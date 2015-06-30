@@ -387,7 +387,7 @@ class CodonUsageParser(GenericCSVParser):
 
     @staticmethod
     def get_codon_usage_fields():
-        return ["Species", "mtDNA size (bp)", "Amino Acids", "AUU", "AUC", "AUA", "CUU", "CUC", "CUA", "CUG", "UUA", "CAA", "CAG", "GUU", "GUC", "GUA", "GUG", "UUU", "UUC", "AUG", "UGU", "UGC", "GCU", "GCC", "GCA", "GCG", "GGU", "GGC", "GGA", "GGG", "CCU", "CCC", "CCA", "CCG", "ACU", "ACC", "ACA", "ACG", "UCU", "UCC", "UCA", "UCG", "AGU", "AGC", "UAU", "UAC", "UGG", "UUG", "AAU", "AAC", "CAU", "CAC", "GAA", "GAG", "GAU", "GAC", "AAA", "AAG", "CGU", "CGC", "CGA", "CGG", "AGA", "AGG", "STOP CODON - UAA", "STOP CODON - UAG", "STOP CODON - UGA"]
+        return ["Species", "mtDNA size (bp)", "Amino Acids", "AUU", "AUC", "AUA", "CUU", "CUC", "CUA", "CUG", "UUA", "CAA", "CAG", "GUU", "GUC", "GUA", "GUG", "UUU", "UUC", "AUG", "UGU", "UGC", "GCU", "GCC", "GCA", "GCG", "GGU", "GGC", "GGA", "GGG", "CCU", "CCC", "CCA", "CCG", "ACU", "ACC", "ACA", "ACG", "UCU", "UCC", "UCA", "UCG", "AGU", "AGC", "UAU", "UAC", "UGG", "UUG", "AAU", "AAC", "CAU", "CAC", "GAA", "GAG", "GAU", "GAC", "AAA", "AAG", "CGU", "CGC", "CGA", "CGG", "AGA", "AGG", "UAA", "UAG", "UGA"]
 
     def __init__(self, csvreader):
         super(CodonUsageParser, self).__init__(csvreader, CodonUsageParser.get_codon_usage_fields(), CodonUsageParser.get_codon_usage_fields()) 

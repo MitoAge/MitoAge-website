@@ -146,6 +146,10 @@ class MitoAgeEntryAdmin(ModelAdmin):
             'classes': ('suit-tab', 'suit-tab-base-composition',),
             'fields': ('bc_d_loop_size', 'bc_d_loop_g', 'bc_d_loop_c', 'bc_d_loop_a', 'bc_d_loop_t', 'bc_d_loop_others')
         }),
+        ('Total transport RNA-coding mtDNA', {
+            'classes': ('suit-tab', 'suit-tab-base-composition',),
+            'fields': ('bc_total_tRNA_size', 'bc_total_tRNA_g', 'bc_total_tRNA_c', 'bc_total_tRNA_a', 'bc_total_tRNA_t', 'bc_total_tRNA_others')
+        }),
         ('Total ribosomal RNA-coding mtDNA', {
             'classes': ('suit-tab', 'suit-tab-base-composition',),
             'fields': ('bc_total_rRNA_size', 'bc_total_rRNA_g', 'bc_total_rRNA_c', 'bc_total_rRNA_a', 'bc_total_rRNA_t', 'bc_total_rRNA_others')

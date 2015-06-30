@@ -2,7 +2,7 @@
 
 {% load templatetags_extra %}
 
-{% if codon_usage.is_empty %}			This does not work cause it doesn't have is_empty defined... need to do a for loop through codons
+{% if not codon_usage %}
 	<b>{{section|codon_usage_nice_title}}:</b> 
 	No data available for this section.
 {% else %} 
@@ -160,9 +160,9 @@
 		    <td class="text-center">{{codon_usage.CGG}}</td>
 		    <td class="text-center">{{codon_usage.AGA}}</td>
 		    <td class="text-center">{{codon_usage.AGG}}</td>
-		    <td class="text-center">{{codon_usage.STOP_UAA}}</td>
-		    <td class="text-center">{{codon_usage.STOP_UAG}}</td>
-		    <td class="text-center">{{codon_usage.STOP_UGA}}</td>
+		    <td class="text-center">{{codon_usage.UAA}}</td>
+		    <td class="text-center">{{codon_usage.UAG}}</td>
+		    <td class="text-center">{{codon_usage.UGA}}</td>
 		</tr>
 		<tr>
 		    <td colspan="4" class="text-center"><b>Codons with 1st base G</b></td>

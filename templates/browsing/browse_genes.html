@@ -2,15 +2,13 @@
 
 {% load staticfiles %}
 
-{% block subtitle %} | Browse taxonomy {% endblock%}
+{% block subtitle %} | Browse genes {% endblock%}
 
-{% block page_title %}Taxonomy browsing {% endblock%}
+{% block page_title %}Browse genes {% endblock%}
 
 {% block content_description %} 
-	<p>In total, our database contains information about {{paginator.count}} taxonomic classes, spanning {{number_of_species}} species.
-	You can either use the links below to browse through the classes, or you may <a class="btn btn-xs btn-primary" href="{% url 'stats' %}">view stats for all the species</a>
+	<p>In total, our database contains information about {{paginator.count}} taxonomic classes:</p>
 {% endblock %}
-
 
 {% block browsing_content %}
 

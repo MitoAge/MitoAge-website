@@ -42,6 +42,7 @@ class BrowseAllClassesList(ListView):
     def get_context_data(self, **kwargs):
         context = super(BrowseAllClassesList, self).get_context_data(**kwargs)
         context['breadcrumbs'] = [Breadcrumb("All taxonomic classes", "", None),]
+        context['number_of_species'] = TaxonomySpecies.objects.all().count()
         return context
 
 
@@ -118,10 +119,10 @@ class TaxonomySpeciesDetail(DetailView):
                                   Breadcrumb(self.object.taxonomy_family.name, "browse_family", self.object.taxonomy_family),
                                   Breadcrumb(self.object.name, "", None),]
         context['base_compositions'] = self.get_base_compositions(self.object)
-        context['general_sections'] = ["total_mtDNA", "total_pc_mtDNA", "d_loop_mtDNA", "total_rRNA_mtDNA", "rRNA_12S", "rRNA_16S"]
+        context['general_sections'] = ["total_mtDNA", "total_pc_mtDNA", "d_loop_mtDNA", "total_tRNA_mtDNA", "total_rRNA_mtDNA", "rRNA_12S", "rRNA_16S"]
         context['gene_sections'] = ['atp6', 'atp8', 'cox1', 'cox2', 'cox3', 'cytb', 'nd1', 'nd2', 'nd3', 'nd4', 'nd4l', 'nd5', 'nd6']
         context['codon_usages'] = self.get_codon_usages(self.object)
-        context['codon_usage_sections'] = ['total_pc_mtDNA', 'atp6', 'atp8', 'cox1', 'cox2', 'cox3', 'cytb', 'nd1', 'nd2', 'nd3', 'nd4', 'nd4l', 'nd5', 'nd6']
+        context['codon_usage_sections'] = ['atp6', 'atp8', 'cox1', 'cox2', 'cox3', 'cytb', 'nd1', 'nd2', 'nd3', 'nd4', 'nd4l', 'nd5', 'nd6', 'total_pc_mtDNA']
         return context
 
     def get_base_compositions(self, species):
@@ -141,6 +142,70 @@ class TaxonomySpeciesDetail(DetailView):
         except MitoAgeEntry.DoesNotExist:
             pass
         return {key: None for key in CodonUsage.get_cu_sections()}
+
+
+class BrowseAllGenes(ListView):
+    model = TaxonomyClass
+    template_name = "browsing/taxonomy_class_list.html"
+    paginate_by = 30
+    
+    def get_context_data(self, **kwargs):
+        context = super(BrowseAllGenes, self).get_context_data(**kwargs)
+        context['breadcrumbs'] = [Breadcrumb("All genes", "", None),]
+        context['gene_sections'] = ['atp6', 'atp8', 'cox1', 'cox2', 'cox3', 'cytb', 'nd1', 'nd2', 'nd3', 'nd4', 'nd4l', 'nd5', 'nd6']
+        return context
+
+class StatsBrowsing(SingleObjectMixin, ListView):
+    template_name = "browsing/stats_browsing.html"
+    paginate_by = 15
+    
+    def get(self, request, *args, **kwargs):
+        
+        # if we want data only for a gene we take it from get
+        if 'gene' in request.GET:
+            self.gene = request.GET['gene']
+        
+        if ('taxon' in request.POST) and ('pk' in request.POST) :
+            # we are working only with a subgroup of species
+            self.taxon = request.GET['taxon']   #keeping it for later too
+            model = {'family':TaxonomyFamily, 'order':TaxonomyOrder, 'class':TaxonomyClass}.get(request.GET['taxon'], None)
+            
+            if model:
+                self.object = self.get_object(queryset=model.objects.all())    #hopefully pk will work
+                return super(StatsBrowsing, self).get(request, *args, **kwargs)
+            
+            # silent fail - will return all species
+        else:
+            # we don't have a taxon and a pk because we want to work on all the species
+            self.object = None
+        return super(StatsBrowsing, self).get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(StatsBrowsing, self).get_context_data(**kwargs)
+        if self.object:
+            # we are working only with a subgroup of species
+            context['title'] = "Stats for %s <i>%s</i>" % (self.taxon, self.object.name)
+            
+            context['stat_group'] = self.object
+            context['taxon'] = self.taxon
+            context['gene'] = self.gene
+            context['breadcrumbs'] = [Breadcrumb("All taxonomic classes", "browse_taxonomy", None), 
+                                      Breadcrumb(self.object.taxonomy_order.taxonomy_class.name, "browse_class", self.object.taxonomy_order.taxonomy_class),
+                                      Breadcrumb(self.object.taxonomy_order.name, "browse_order", self.object.taxonomy_order),
+                                      Breadcrumb(self.object.name, "", None),]
+        else:
+            # we don't have a taxon and a pk because we want to work on all the species
+            pass
+        return context
+
+    def get_queryset(self):
+        if self.object:
+            # if we are seeing stats for a family, we shouldn't browse futher to species - no point
+            return {'family':None, 'order':self.object.taxonomy_families.all(), 'class':self.object.taxonomy_orders.all()}.get[self.taxon] # it shouldn't fail if self.object
+        # if we are seeing stats for all species, browsing should show all classes
+        return TaxonomyClass.objects.all()
+
+
 
 def search(request):
     query_string = ''

@@ -8,7 +8,8 @@
 
 {% block content_description %} 
 	<p>Order <b>{{ taxonomy_order.name }}</b> contains {{paginator.count}} taxonomic families spanning {{taxonomy_order.number_of_species}} species.
-	You can either use the links <br/>below to browse through the families, or you may view stats for the <a href="">entire order</a>.</p>
+	You can either use the links <br/>below to browse through the families, or you may <a class="btn btn-xs btn-primary" href="{% url 'stats' taxonomy_order.pk 'order' %}">view stats for the entire order</a> 
+	</p>
 {% endblock %}
 
 {% block browsing_content %}

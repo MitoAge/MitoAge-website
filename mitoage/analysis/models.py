@@ -104,14 +104,15 @@ class BaseComposition():
 
     @staticmethod
     def get_bc_sections():
-        return ['total_mtDNA', 'total_pc_mtDNA', 'd_loop_mtDNA', 'total_rRNA_mtDNA', 'atp6', 'atp8', 'cox1', 'cox2', 'cox3', 'cytb', 'nd1', 'nd2', 'nd3', 'nd4', 'nd4l', 'nd5', 'nd6', 'rRNA_12S', 'rRNA_16S']
+        return ['total_mtDNA', 'total_pc_mtDNA', 'd_loop_mtDNA', 'total_tRNA_mtDNA', 'total_rRNA_mtDNA', 'atp6', 'atp8', 'cox1', 'cox2', 'cox3', 'cytb', 'nd1', 'nd2', 'nd3', 'nd4', 'nd4l', 'nd5', 'nd6', 'rRNA_12S', 'rRNA_16S']
 
     @staticmethod
     def get_nice_title(key):
         return {
             'total_mtDNA': "Total mtDNA",
-            'total_pc_mtDNA': "Protein-coding region",
+            'total_pc_mtDNA': "Total protein-coding region",
             'd_loop_mtDNA': "D-loop region",
+            'total_tRNA_mtDNA': "Total tRNA-coding region",
             'total_rRNA_mtDNA': "Total rRNA-coding region",
             'atp6': "Gene ATP6",
             'atp8': "Gene ATP8",
@@ -140,7 +141,7 @@ class CodonUsage(models.Model):
     @staticmethod
     def get_nice_title(key):
         return {
-            'total_pc_mtDNA': "Protein-coding region of mtDNA",
+            'total_pc_mtDNA': "Total protein-coding region",
             'atp6': "Gene ATP6",
             'atp8': "Gene ATP8",
             'cox1': "Gene COX1",
@@ -235,9 +236,9 @@ class CodonUsage(models.Model):
     CGG = models.IntegerField(max_length=11, blank=True, null = True)
     AGA = models.IntegerField(max_length=11, blank=True, null = True)
     AGG = models.IntegerField(max_length=11, blank=True, null = True)
-    STOP_UAA = models.IntegerField(max_length=11, blank=True, null = True)
-    STOP_UAG = models.IntegerField(max_length=11, blank=True, null = True)
-    STOP_UGA = models.IntegerField(max_length=11, blank=True, null = True)
+    UAA = models.IntegerField(max_length=11, blank=True, null = True)
+    UAG = models.IntegerField(max_length=11, blank=True, null = True)
+    UGA = models.IntegerField(max_length=11, blank=True, null = True)
 
     def set_codon_usage_from_dictionary(self, codon_usage_dict):
         self.AUU = int(codon_usage_dict['AUU'])
@@ -301,15 +302,18 @@ class CodonUsage(models.Model):
         self.CGG = int(codon_usage_dict['CGG'])
         self.AGA = int(codon_usage_dict['AGA'])
         self.AGG = int(codon_usage_dict['AGG'])
-        self.STOP_UAA = int(codon_usage_dict['STOP CODON - UAA'])
-        self.STOP_UAG = int(codon_usage_dict['STOP CODON - UAG'])
-        self.STOP_UGA = int(codon_usage_dict['STOP CODON - UGA'])
+        self.UAA = int(codon_usage_dict['UAA'])
+        self.UAG = int(codon_usage_dict['UAG'])
+        self.UGA = int(codon_usage_dict['UGA'])
 
     def to_string(self):
         return "[AUU:%s;AUC:%s;AUA:%s;CUU:%s;CUC:%s ... ]" % (self.AUU, self.AUC, self.AUA, self.CUU, self.CUC)
 
+    def is_empty(self):
+        return self.AUU == None and self.AUC == None and  self.AUA == None and  self.CUU == None and self.CUC == None and self.CUA == None and self.CUG == None and self.UUA == None and self.CAA == None and self.CAG == None and self.GUU == None and self.GUC == None and self.GUA == None and self.GUG == None and self.UUU == None and self.UUC == None and self.AUG == None and self.UGU == None and self.UGC == None and self.GCU == None and self.GCC == None and self.GCA == None and self.GCG == None and self.GGU == None and self.GGC == None and self.GGA == None and self.GGG == None and self.CCU == None and self.CCC == None and self.CCA == None and self.CCG == None and self.ACU == None and self.ACC == None and self.ACA == None and self.ACG == None and self.UCU == None and self.UCC == None and self.UCA == None and self.UCG == None and self.AGU == None and self.AGC == None and self.UAU == None and self.UAC == None and self.UGG == None and self.UUG == None and self.AAU == None and self.AAC == None and self.CAU == None and self.CAC == None and self.GAA == None and self.GAG == None and self.GAU == None and self.GAC == None and self.AAA == None and self.AAG == None and self.CGU == None and self.CGC == None and self.CGA == None and self.CGG == None and self.AGA == None and self.AGG == None and self.UAA == None and self.UAG == None and self.UGA == None and self.aa==None and self.size==None
+
     def same_values(self, other):
-        return self.AUU == other.AUU and self.AUC == other.AUC and  self.AUA == other.AUA and  self.CUU == other.CUU and self.CUC == other.CUC and self.CUA == other.CUA and self.CUG == other.CUG and self.UUA == other.UUA and self.CAA == other.CAA and self.CAG == other.CAG and self.GUU == other.GUU and self.GUC == other.GUC and self.GUA == other.GUA and self.GUG == other.GUG and self.UUU == other.UUU and self.UUC == other.UUC and self.AUG == other.AUG and self.UGU == other.UGU and self.UGC == other.UGC and self.GCU == other.GCU and self.GCC == other.GCC and self.GCA == other.GCA and self.GCG == other.GCG and self.GGU == other.GGU and self.GGC == other.GGC and self.GGA == other.GGA and self.GGG == other.GGG and self.CCU == other.CCU and self.CCC == other.CCC and self.CCA == other.CCA and self.CCG == other.CCG and self.ACU == other.ACU and self.ACC == other.ACC and self.ACA == other.ACA and self.ACG == other.ACG and self.UCU == other.UCU and self.UCC == other.UCC and self.UCA == other.UCA and self.UCG == other.UCG and self.AGU == other.AGU and self.AGC == other.AGC and self.UAU == other.UAU and self.UAC == other.UAC and self.UGG == other.UGG and self.UUG == other.UUG and self.AAU == other.AAU and self.AAC == other.AAC and self.CAU == other.CAU and self.CAC == other.CAC and self.GAA == other.GAA and self.GAG == other.GAG and self.GAU == other.GAU and self.GAC == other.GAC and self.AAA == other.AAA and self.AAG == other.AAG and self.CGU == other.CGU and self.CGC == other.CGC and self.CGA == other.CGA and self.CGG == other.CGG and self.AGA == other.AGA and self.AGG == other.AGG and self.STOP_UAA == other.STOP_UAA and self.STOP_UAG == other.STOP_UAG and self.STOP_UGA == other.STOP_UGA and self.aa==other.aa and self.size==other.size
+        return self.AUU == other.AUU and self.AUC == other.AUC and  self.AUA == other.AUA and  self.CUU == other.CUU and self.CUC == other.CUC and self.CUA == other.CUA and self.CUG == other.CUG and self.UUA == other.UUA and self.CAA == other.CAA and self.CAG == other.CAG and self.GUU == other.GUU and self.GUC == other.GUC and self.GUA == other.GUA and self.GUG == other.GUG and self.UUU == other.UUU and self.UUC == other.UUC and self.AUG == other.AUG and self.UGU == other.UGU and self.UGC == other.UGC and self.GCU == other.GCU and self.GCC == other.GCC and self.GCA == other.GCA and self.GCG == other.GCG and self.GGU == other.GGU and self.GGC == other.GGC and self.GGA == other.GGA and self.GGG == other.GGG and self.CCU == other.CCU and self.CCC == other.CCC and self.CCA == other.CCA and self.CCG == other.CCG and self.ACU == other.ACU and self.ACC == other.ACC and self.ACA == other.ACA and self.ACG == other.ACG and self.UCU == other.UCU and self.UCC == other.UCC and self.UCA == other.UCA and self.UCG == other.UCG and self.AGU == other.AGU and self.AGC == other.AGC and self.UAU == other.UAU and self.UAC == other.UAC and self.UGG == other.UGG and self.UUG == other.UUG and self.AAU == other.AAU and self.AAC == other.AAC and self.CAU == other.CAU and self.CAC == other.CAC and self.GAA == other.GAA and self.GAG == other.GAG and self.GAU == other.GAU and self.GAC == other.GAC and self.AAA == other.AAA and self.AAG == other.AAG and self.CGU == other.CGU and self.CGC == other.CGC and self.CGA == other.CGA and self.CGG == other.CGG and self.AGA == other.AGA and self.AGG == other.AGG and self.UAA == other.UAA and self.UAG == other.UAG and self.UGA == other.UGA and self.aa==other.aa and self.size==other.size
 
     def codons_1st_g(self):
         return self.GAA + self.GAC + self.GAG + self.GAU + self.GCA + self.GCC + self.GCG + self.GCU + self.GGA + self.GGC + self.GGG + self.GGU + self.GUA + self.GUC + self.GUG + self.GUU
@@ -321,30 +325,30 @@ class CodonUsage(models.Model):
         return self.AAA + self.AAC + self.AAG + self.AAU + self.ACA + self.ACC + self.ACG + self.ACU + self.AGA + self.AGC + self.AGG + self.AGU + self.AUA + self.AUC + self.AUG + self.AUU
 
     def codons_1st_u(self):
-        return self.UAC + self.UAU + self.STOP_UAA + self.STOP_UAG + self.UCA + self.UCC + self.UCG + self.UCU + self.UGC + self.UGG + self.UGU + self.STOP_UGA + self.UUA + self.UUC + self.UUG + self.UUU
+        return self.UAC + self.UAU + self.UAA + self.UAG + self.UCA + self.UCC + self.UCG + self.UCU + self.UGC + self.UGG + self.UGU + self.UGA + self.UUA + self.UUC + self.UUG + self.UUU
 
 
     def codons_2nd_g(self):
-        return self.AGA + self.AGC + self.AGG + self.AGU + self.CGA + self.CGC + self.CGG + self.CGU + self.GGA + self.GGC + self.GGG + self.GGU + self.STOP_UGA + self.UGC + self.UGG + self.UGU
+        return self.AGA + self.AGC + self.AGG + self.AGU + self.CGA + self.CGC + self.CGG + self.CGU + self.GGA + self.GGC + self.GGG + self.GGU + self.UGA + self.UGC + self.UGG + self.UGU
 
     def codons_2nd_c(self):
         return self.ACA + self.ACC + self.ACG + self.ACU + self.CCA + self.CCC + self.CCG + self.CCU + self.GCA + self.GCC + self.GCG + self.GCU + self.UCA + self.UCC + self.UCG + self.UCU
 
     def codons_2nd_a(self):
-        return self.AAA + self.AAC + self.AAG + self.AAU + self.CAA + self.CAC + self.CAG + self.CAU + self.GAA + self.GAC + self.GAG + self.GAU + self.STOP_UAA + self.UAC + self.STOP_UAG + self.UAU
+        return self.AAA + self.AAC + self.AAG + self.AAU + self.CAA + self.CAC + self.CAG + self.CAU + self.GAA + self.GAC + self.GAG + self.GAU + self.UAA + self.UAC + self.UAG + self.UAU
 
     def codons_2nd_u(self):
         return self.AUC + self.AUU + self.CUA + self.CUC + self.CUG + self.CUU + self.GUC + self.GUG + self.GUU + self.AUA + self.AUG + self.GUA  + self.UUA + self.UUC + self.UUG + self.UUU
 
 
     def codons_3rd_g(self):
-        return self.AAG + self.ACG + self.AGG + self.AUG + self.CAG + self.CCG + self.CGG + self.CUG + self.GAG + self.GCG + self.GGG + self.GUG + self.STOP_UAG + self.UCG + self.UGG + self.UUG
+        return self.AAG + self.ACG + self.AGG + self.AUG + self.CAG + self.CCG + self.CGG + self.CUG + self.GAG + self.GCG + self.GGG + self.GUG + self.UAG + self.UCG + self.UGG + self.UUG
 
     def codons_3rd_c(self):
         return self.AAC + self.ACC + self.AGC + self.AUC + self.CAC + self.CCC + self.CGC + self.CUC + self.GAC + self.GCC + self.GGC + self.GUC + self.UAC + self.UCC + self.UGC + self.UUC
 
     def codons_3rd_a(self):
-        return self.AAA + self.ACA + self.AGA + self.AUA + self.CAA + self.CCA + self.CGA + self.CUA + self.GAA + self.GCA + self.GGA + self.GUA + self.STOP_UAA + self.UCA + self.STOP_UGA + self.UUA
+        return self.AAA + self.ACA + self.AGA + self.AUA + self.CAA + self.CCA + self.CGA + self.CUA + self.GAA + self.GCA + self.GGA + self.GUA + self.UAA + self.UCA + self.UGA + self.UUA
 
     def codons_3rd_u(self):
         return self.ACU + self.AUU + self.CAU + self.CCU + self.CGU + self.CUU + self.GCU + self.GGU + self.GUU + self.AAU + self.AGU + self.GAU  + self.UAU + self.UCU + self.UGU + self.UUU
@@ -381,6 +385,14 @@ class MitoAgeEntry(models.Model):
     bc_d_loop_t = models.IntegerField("T content", max_length=11, blank=True, null = True)
     bc_d_loop_a = models.IntegerField("A content", max_length=11, blank=True, null = True)
     bc_d_loop_others = models.IntegerField("Other", max_length=11, blank=True, null = True)
+
+    #    Total tRNA region
+    bc_total_tRNA_size = models.IntegerField("Size of tRNA region of mtDNA", max_length=11, blank=True, null = True)
+    bc_total_tRNA_g = models.IntegerField("G content", max_length=11, blank=True, null = True)
+    bc_total_tRNA_c = models.IntegerField("C content", max_length=11, blank=True, null = True)
+    bc_total_tRNA_t = models.IntegerField("T content", max_length=11, blank=True, null = True)
+    bc_total_tRNA_a = models.IntegerField("A content", max_length=11, blank=True, null = True)
+    bc_total_tRNA_others = models.IntegerField("Other", max_length=11, blank=True, null = True)
 
     #    Total rRNA region
     bc_total_rRNA_size = models.IntegerField("Size of rRNA region of mtDNA", max_length=11, blank=True, null = True)
@@ -525,6 +537,7 @@ class MitoAgeEntry(models.Model):
             'total_mtDNA': BaseComposition(self.bc_total_mtDNA_size, self.bc_total_mtDNA_g, self.bc_total_mtDNA_c, self.bc_total_mtDNA_t, self.bc_total_mtDNA_a, self.bc_total_mtDNA_others),
             'total_pc_mtDNA': BaseComposition(self.bc_total_mtDNA_pc_size, self.bc_total_mtDNA_pc_g, self.bc_total_mtDNA_pc_c, self.bc_total_mtDNA_pc_t, self.bc_total_mtDNA_pc_a, self.bc_total_mtDNA_bc_others),
             'd_loop_mtDNA': BaseComposition(self.bc_d_loop_size, self.bc_d_loop_g, self.bc_d_loop_c, self.bc_d_loop_t, self.bc_d_loop_a, self.bc_d_loop_others),
+            'total_tRNA_mtDNA': BaseComposition(self.bc_total_tRNA_size, self.bc_total_tRNA_g, self.bc_total_tRNA_c, self.bc_total_tRNA_t, self.bc_total_tRNA_a, self.bc_total_tRNA_others),
             'total_rRNA_mtDNA': BaseComposition(self.bc_total_rRNA_size, self.bc_total_rRNA_g, self.bc_total_rRNA_c, self.bc_total_rRNA_t, self.bc_total_rRNA_a, self.bc_total_rRNA_others),
             'atp6': BaseComposition(self.bc_atp6_size, self.bc_atp6_g, self.bc_atp6_c, self.bc_atp6_t, self.bc_atp6_a, self.bc_atp6_others),
             'atp8': BaseComposition(self.bc_atp8_size, self.bc_atp8_g, self.bc_atp8_c, self.bc_atp8_t, self.bc_atp8_a, self.bc_atp8_others),
@@ -550,6 +563,8 @@ class MitoAgeEntry(models.Model):
             (self.bc_total_mtDNA_pc_size, self.bc_total_mtDNA_pc_g, self.bc_total_mtDNA_pc_c, self.bc_total_mtDNA_pc_t, self.bc_total_mtDNA_pc_a, self.bc_total_mtDNA_bc_others) = base_composition.to_raw_data()
         if type_of_bc=='d_loop_mtDNA':
             (self.bc_d_loop_size, self.bc_d_loop_g, self.bc_d_loop_c, self.bc_d_loop_t, self.bc_d_loop_a, self.bc_d_loop_others) = base_composition.to_raw_data()
+        if type_of_bc=='total_tRNA_mtDNA':
+            (self.bc_total_tRNA_size, self.bc_total_tRNA_g, self.bc_total_tRNA_c, self.bc_total_tRNA_t, self.bc_total_tRNA_a, self.bc_total_tRNA_others) = base_composition.to_raw_data()
         if type_of_bc=='total_rRNA_mtDNA':
             (self.bc_total_rRNA_size, self.bc_total_rRNA_g, self.bc_total_rRNA_c, self.bc_total_rRNA_t, self.bc_total_rRNA_a, self.bc_total_rRNA_others) = base_composition.to_raw_data()
         if type_of_bc=='atp6':
