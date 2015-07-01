@@ -4,12 +4,13 @@
 
 {% block subtitle %} | Stats for species {% endblock%}
 
-{% block page_title %} {{ title }} {% endblock%}
+{% block page_title %} {{ title|safe }} {% endblock%}
 
 {% block content_description %} 
+
 	<p>Stats description ----- <b>{{ taxonomy_family.name }}</b> contains {{paginator.count}} species.
-	You can either use the links below to browse through the <br/>species, or you may 
-	</p>
+	You can either use the links below to browse through the <br/>species, or you may </p>
+
 {% endblock %}
 
 {% block browsing_content %}

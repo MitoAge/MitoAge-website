@@ -1,0 +1,40 @@
+{% extends 'static_pages/generic_static_page.html' %}
+
+{% load staticfiles %}
+
+{% block subtitle %} | Frequently asked questions {% endblock%}
+{% block page_title %}Frequently asked questions {% endblock%}
+
+{% block static_content %}
+
+	<p class="lead"><b>Q: </b>What can I find in MitoAge?</p>
+	<p class="lead"><b>A: </b>MitoAge contains calculated mtDNA compositional features of the entire mitochondrial genome, mtDNA coding (tRNA, rRNA, protein-coding genes) and 
+	non-coding (D-loop, insertions) regions, codon usage for each protein-coding gene, and longevity records for over 900 species from all taxa of the 
+	Animalia kingdom.<br/><br/></p>
+	
+	<p class="lead"><b>Q: </b>How do I search for entries?</p>
+	<p class="lead"><b>A: </b>To look for entries you may use the free form search input field at the top of the website. <br/><br/></p>
+	
+	<p class="lead"><b>Q: </b>How can I download the specific dataset?</p>
+	<p class="lead"><b>A: </b>Unfortunately, at this moment it is not possible to export a certain taxon, species or a certain region only. However, 
+	this feature is currently under development and will become available soon. In the meantime, the possibility to download data for a certain
+	mtDNA region exists.<br/><br/></p>
+	
+	<p class="lead"><b>Q: </b>How can I download the whole database?</p>
+	<p class="lead"><b>A: </b>Please go to the Download page. You will have the option of downloading the entire database. <br/><br/></p>
+	
+	<p class="lead"><b>Q: </b>What statistics fuctions are available for taxonomic groups?</p>
+	<p class="lead"><b>A: </b>Min, max, average±SD, median and range (minimum, maximum) are provided for any taxonomic group. 
+	Additionally, the Spearman correlation coefficient of maximum lifespan with selected mtDNA characteristics is also computed.<br/><br/></p>
+	
+	<p class="lead"><b>Q: </b>Where can I find more mtDNA information (e.g. relevant data on metabolic rate and body temperature</p>
+	<p class="lead"><b>A: </b>More data related to longevity in animals can be found at AnAge, a curated database of ageing and life 
+	history in animals.<br/><br/></p>
+	
+	<p class="lead"><b>Q: </b>I cannot find info on the gene in searched results.  What to do?</p>
+	<p class="lead"><b>A: </b>Firstly, please check again the name of the gene. 
+	Second, check the alternative gene names (aliases) in our database. 
+	Lastly, please keep in mind that there are given species in which not all the gene exist.  
+	</p>
+
+{% endblock %}

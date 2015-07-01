@@ -7,10 +7,28 @@
 
 {% block static_content %}
 
-    <p class="lead">Pin a fixed-height footer to the bottom of the viewport in desktop browsers with this custom HTML and CSS. A fixed navbar has been added within <code>#wrap</code> with <code>padding-top: 60px;</code> on the <code>.container</code>.</p>
+	<h3>Searching and browsing</h3>
+	<p class="lead">MitoAge offers several possibilities for you to navigate through the available species and taxa. 
+	To search, you may type keywords or phrases relating to the species' common or scientific name that you wish to find. 
+	A paginated list of species available in our database is provided. Note that the search is case insensitive.
+	</p>
 	
-	<div class="col-md-4 col-md-offset-4">
-    	<img class="img-rounded img-responsive center-block thumbnail" src="{% static 'images/website_under_construction.jpg' %}"/>
-	</div>
+	<p class="lead">Browsing can be done in 2 ways: though the taxonomic relationships, in which case, at each step you will have to 
+	choose classes, orders, families and finally species in order to reach the desired information, or starting from genes.
+	When browsing genes, only stats (see next section) will be presented for taxonomic gropus of species. 
+	
+	<br/><br/></p>
+	
+	<h3>Stats for species of interest</h4>
+	<p class="lead">When browsing through the taxa (or through the genes), basic sequence statistics for any taxonomic groups are also made available.
+	The difference between the 2 ways of browsing can be seen in terms of stats. When browsing through genes, only the stats specific 
+	to that gene are available. Contrastly, browsing taxa directly allows viewing sections for each of the regions of interest of the mtDNA. 
+	<br/><br/></p>
+	
+	
+	<h3>Downloading and using the data off-website</h4>
+	<p class="lead">In order to perform more complex analyses, the website allows downloading the entire datasets. This can be done from the 
+	Download page. A built counter and a built release date are provided to keep track of different database versions.</p> 
+
 
 {% endblock %}
