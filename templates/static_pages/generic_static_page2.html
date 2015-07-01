@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block content %}
+	<div class="panel panel-default base-composition-panel-body">
+		<div class="panel-body">
+			{% block static_content %}{% endblock %}
+		</div>
+	</div>
+	
+{% endblock %}

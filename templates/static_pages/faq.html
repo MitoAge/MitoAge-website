@@ -7,34 +7,37 @@
 
 {% block static_content %}
 
-	<p class="lead"><b>Q: </b>What can I find in MitoAge?</p>
-	<p class="lead"><b>A: </b>MitoAge contains calculated mtDNA compositional features of the entire mitochondrial genome, mtDNA coding (tRNA, rRNA, protein-coding genes) and 
+	<p><b>Q: </b>What can I find in MitoAge?</p>
+	<p><b>A: </b>MitoAge contains calculated mtDNA compositional features of the entire mitochondrial genome, mtDNA coding (tRNA, rRNA, protein-coding genes) and 
 	non-coding (D-loop, insertions) regions, codon usage for each protein-coding gene, and longevity records for over 900 species from all taxa of the 
 	Animalia kingdom.<br/><br/></p>
 	
-	<p class="lead"><b>Q: </b>How do I search for entries?</p>
-	<p class="lead"><b>A: </b>To look for entries you may use the free form search input field at the top of the website. <br/><br/></p>
+	<p><b>Q: </b>How do I search for entries?</p>
+	<p><b>A: </b>To look for entries you may use the free form search input field at the top of the website. 
+	Search is case insensitive, and you can search both through species' common or scientific names.<br/><br/></p>
 	
-	<p class="lead"><b>Q: </b>How can I download the specific dataset?</p>
-	<p class="lead"><b>A: </b>Unfortunately, at this moment it is not possible to export a certain taxon, species or a certain region only. However, 
-	this feature is currently under development and will become available soon. In the meantime, the possibility to download data for a certain
-	mtDNA region exists.<br/><br/></p>
+	<p><b>Q: </b>How can I download a specific dataset?</p>
+	<p><b>A: </b>Unfortunately, at this moment it is not possible to export a certain taxon, species or data on a certain mtDNA region only. 
+	However, this feature is already under development and will become available soon. In the meantime, online the possibility to download the entire data 
+	for a certain mtDNA region exists.<br/><br/></p>
 	
-	<p class="lead"><b>Q: </b>How can I download the whole database?</p>
-	<p class="lead"><b>A: </b>Please go to the Download page. You will have the option of downloading the entire database. <br/><br/></p>
+	<p><b>Q: </b>How can I download the whole database?</p>
+	<p><b>A: </b>Please go to the <a href="{% url 'download' %}">download page</a>. You will have the option of downloading the entire database as well as the entire dataset
+	for certain mtDNA regions. <br/><br/></p>
 	
-	<p class="lead"><b>Q: </b>What statistics fuctions are available for taxonomic groups?</p>
-	<p class="lead"><b>A: </b>Min, max, average±SD, median and range (minimum, maximum) are provided for any taxonomic group. 
-	Additionally, the Spearman correlation coefficient of maximum lifespan with selected mtDNA characteristics is also computed.<br/><br/></p>
+	<p><b>Q: </b>What statistics fuctions are available for taxonomic groups?</p>
+	<p><b>A: </b>Min, max, average±SD, median and range (minimum, maximum) are provided for data in any taxonomic group. 
+	Values that are assessed in this way include base composition, GC/AT fractions and maximum lifespan. Additionally, the Spearman correlation 
+	coefficient of maximum lifespan with some of the mtDNA characteristics is also computed.<br/><br/></p>
 	
-	<p class="lead"><b>Q: </b>Where can I find more mtDNA information (e.g. relevant data on metabolic rate and body temperature</p>
-	<p class="lead"><b>A: </b>More data related to longevity in animals can be found at AnAge, a curated database of ageing and life 
+	<p><b>Q: </b>Where can I find more information for a certain species (e.g. relevant mtDNA data like metabolic rate and body temperature)</p>
+	<p><b>A: </b>More data related to longevity in animals can be found at <a href="http://genomics.senescence.info/species/">AnAge</a>, a curated database of ageing and life 
 	history in animals.<br/><br/></p>
 	
-	<p class="lead"><b>Q: </b>I cannot find info on the gene in searched results.  What to do?</p>
-	<p class="lead"><b>A: </b>Firstly, please check again the name of the gene. 
-	Second, check the alternative gene names (aliases) in our database. 
-	Lastly, please keep in mind that there are given species in which not all the gene exist.  
+	<p><b>Q: </b>I cannot find info on the gene that I am interested in.  What to do?</p>
+	<p><b>A: </b>Firstly, please check again the name of the gene. 
+	Second, check the alternative gene names (aliases) in our database - you may find a list of aliases in our <a href="{% url 'glossary' %}">Glossary, definitions and aliases page</a>. 
+	Lastly, please keep in mind that our database hosts information only for mtDNA genes, and that there are species in which not all the gene exist.
 	</p>
 
 {% endblock %}

@@ -1,11 +1,81 @@
-{% extends 'static_pages/generic_static_page.html' %}
+{% extends 'base.html' %}
 
 {% load staticfiles %}
 
 {% block subtitle %} | Downloads page {% endblock%}
-{% block page_title %}Downloads page {% endblock%}
-
-{% block static_content %}
-
-
+{% block content %}
+	<div class="panel panel-default base-composition-panel-body">
+		<div class="panel-body">
+			<h3 class="text-center">MitoAge Build 1.0 - downloads</h3>
+		
+			<h4>Build download:</h4>
+			<p>Please use the following link to download the entire build:
+				<a class="btn btn-xs btn-primary" href="https://s3-eu-west-1.amazonaws.com/mitoage/mitoage_build1_full_database.zip">Download all datasets</a>
+			</p>
+			<br/>
+			<div class="row">
+				<div class="col-md-6">
+					<h4>Downloads for specific mtDNA regions:</h4>
+					<p>Please use the following link for total mtDNA data: 
+						<a class="btn btn-xs btn-success" href="https://s3-eu-west-1.amazonaws.com/mitoage/mitoage_build1_total_rna.zip">Download</a>
+					</p>
+					<p>Please use the following link for protein-coding regions:
+						<a class="btn btn-xs btn-success" href="https://s3-eu-west-1.amazonaws.com/mitoage/mitoage_build1_protein_coding_rna.zip">Download</a>
+					</p>
+					<p>Please use the following link for rRNA-coding regions:
+						<a class="btn btn-xs btn-success" href="https://s3-eu-west-1.amazonaws.com/mitoage/mitoage_build1_ribosomal_rna.zip">Download</a>
+					</p>
+					<p>Please use the following link for tRNA-coding regions:
+						<a class="btn btn-xs btn-success" href="https://s3-eu-west-1.amazonaws.com/mitoage/mitoage_build1_transfer_rna.zip">Download</a>
+					</p>
+					<p>Please use the following link for the d-loop region:
+						<a class="btn btn-xs btn-success" href="https://s3-eu-west-1.amazonaws.com/mitoage/mitoage_build1_d_loop_rna.zip">Download</a>
+					</p>
+				</div>
+				<div class="col-md-6">
+					<h4>Downloads for mtDNA genes:</h4>
+					<p>Please use the following link for the mtDNA gene ATP6:
+						<a class="btn btn-xs btn-info" href="https://s3-eu-west-1.amazonaws.com/mitoage/mitoage_build1_gene_atp6.zip">Download</a>
+					</p>
+					<p>Please use the following link for the mtDNA gene ATP8:
+						<a class="btn btn-xs btn-info" href="https://s3-eu-west-1.amazonaws.com/mitoage/mitoage_build1_gene_atp8.zip">Download</a>
+					</p>
+					<p>Please use the following link for the mtDNA gene COX1:
+						<a class="btn btn-xs btn-info" href="https://s3-eu-west-1.amazonaws.com/mitoage/mitoage_build1_gene_cox1.zip">Download</a>
+					</p>
+					<p>Please use the following link for the mtDNA gene COX2:
+						<a class="btn btn-xs btn-info" href="https://s3-eu-west-1.amazonaws.com/mitoage/mitoage_build1_gene_cox2.zip">Download</a>
+					</p>
+					<p>Please use the following link for the mtDNA gene COX3:
+						<a class="btn btn-xs btn-info" href="https://s3-eu-west-1.amazonaws.com/mitoage/mitoage_build1_gene_cox3.zip">Download</a>
+					</p>
+					<p>Please use the following link for the mtDNA gene CYTB:
+						<a class="btn btn-xs btn-info" href="https://s3-eu-west-1.amazonaws.com/mitoage/mitoage_build1_gene_cytb.zip">Download</a>
+					</p>
+					<p>Please use the following link for the mtDNA gene ND1:
+						<a class="btn btn-xs btn-info" href="https://s3-eu-west-1.amazonaws.com/mitoage/mitoage_build1_gene_nd1.zip">Download</a>
+					</p>
+					<p>Please use the following link for the mtDNA gene ND2:
+						<a class="btn btn-xs btn-info" href="https://s3-eu-west-1.amazonaws.com/mitoage/mitoage_build1_gene_nd2.zip">Download</a>
+					</p>
+					<p>Please use the following link for the mtDNA gene ND3:
+						<a class="btn btn-xs btn-info" href="https://s3-eu-west-1.amazonaws.com/mitoage/mitoage_build1_gene_nd3.zip">Download</a>
+					</p>
+					<p>Please use the following link for the mtDNA gene ND4:
+						<a class="btn btn-xs btn-info" href="https://s3-eu-west-1.amazonaws.com/mitoage/mitoage_build1_gene_nd4.zip">Download</a>
+					</p>
+					<p>Please use the following link for the mtDNA gene ND4L:
+						<a class="btn btn-xs btn-info" href="https://s3-eu-west-1.amazonaws.com/mitoage/mitoage_build1_gene_nd4l.zip">Download</a>
+					</p>
+					<p>Please use the following link for the mtDNA gene ND5:
+						<a class="btn btn-xs btn-info" href="https://s3-eu-west-1.amazonaws.com/mitoage/mitoage_build1_gene_nd5.zip">Download</a>
+					</p>
+					<p>Please use the following link for the mtDNA gene ND6:
+						<a class="btn btn-xs btn-info" href="https://s3-eu-west-1.amazonaws.com/mitoage/mitoage_build1_gene_nd6.zip">Download</a>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	
 {% endblock %}
