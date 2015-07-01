@@ -191,8 +191,12 @@ class StatsBrowsing(SingleObjectMixin, ListView):
             
             context['stat_group'] = self.object
             context['taxon'] = self.taxon
+            context['subtaxon'] = {'family':None, 'order':'family', 'class':'order'}.get(self.taxon, None)
             context['gene'] = self.gene
-            context['breadcrumbs'] = [Breadcrumb("All taxonomic classes", "browse_taxonomy", None), 
+            if self.gene:
+                pass
+            else:
+                context['breadcrumbs'] = [Breadcrumb("All species", "browse_taxonomy", None), 
                                       #Breadcrumb(self.object.taxonomy_order.taxonomy_class.name, "browse_class", self.object.taxonomy_order.taxonomy_class),
                                       #Breadcrumb(self.object.taxonomy_order.name, "browse_order", self.object.taxonomy_order),
                                       #Breadcrumb(self.object.name, "", None),
@@ -206,7 +210,7 @@ class StatsBrowsing(SingleObjectMixin, ListView):
         if self.object:
             # if we are seeing stats for a family, we shouldn't browse futher to species - no point
             if self.taxon=='family':
-                return None
+                return self.object.taxonomy_species.all()
             elif self.taxon=='order':
                 return self.object.taxonomy_families.all()
             elif self.taxon=='class':

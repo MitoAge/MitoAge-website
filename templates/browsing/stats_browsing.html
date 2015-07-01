@@ -6,23 +6,25 @@
 
 {% block page_title %} {{ title|safe }} {% endblock%}
 
-{% block content_description %} 
+{% block browse_title %}Stats:{% endblock%}
 
-	<p>Stats description ----- <b>{{ taxonomy_family.name }}</b> contains {{paginator.count}} species.
-	You can either use the links below to browse through the <br/>species, or you may </p>
+
+{% block content_description %} 
 
 {% endblock %}
 
 {% block browsing_content %}
 
 	<div class="row">
-		{% for entry in object_list %}
-			<div class="col-md-4">
-			<li>
-				<a href="{% url 'stats' entry.pk 'class' %}"> {{ entry.name }} </a>
-			</li>
-			</div>
-		{% endfor %}
+		{% if subtaxon %}
+			{% for entry in object_list %}
+				<div class="col-md-4">
+					<li>
+						<a href="{% url 'stats' entry.pk subtaxon %}"> {{ entry.name }} </a>
+					</li>
+				</div>
+			{% endfor %}
+		{% endif %}
 	</div>
 
 {% endblock %}
