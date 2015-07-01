@@ -14,19 +14,24 @@
 		 <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-education"></span> Help!<strong class="caret"></strong></a>
 		<ul class="dropdown-menu">
 			<li>
+				<a href="{% url 'terms' %}">Terms of use</a>
+			</li>
+			<li class="divider"></li>
+			<li>
 				<a href="{% url 'user_guide' %}">User guide</a>
 			</li>
 			<li>
 				<a href="{% url 'methods' %}">Materials & methods</a>
 			</li>
 			<li>
+				<a href="{% url 'faq' %}">Frequent questions</a>
+			</li>
+			<li class="divider"></li>
+			<li>
 				<a href="{% url 'glossary' %}">Glossary & definitions</a>
 			</li>
 			<li>
-				<a href="{% url 'faq' %}">Frequent questions</a>
-			</li>
-			<li>
-				<a href="{% url 'terms' %}">Terms of use</a>
+				<a href="{% url 'aliases' %}">Gene aliases</a>
 			</li>
 
 	{% comment %}

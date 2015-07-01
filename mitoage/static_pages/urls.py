@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url
-from django.views.generic.base import TemplateView, RedirectView
+from django.views.generic.base import TemplateView
 
 urlpatterns = patterns('mitoage.static_pages.views',
 
@@ -12,6 +12,5 @@ urlpatterns = patterns('mitoage.static_pages.views',
     url(r'^download/$', TemplateView.as_view(template_name="static_pages/download.html"), name='download'),
     url(r'^news/$', TemplateView.as_view(template_name="static_pages/news.html"), name='news'),
     url(r'^terms/$', TemplateView.as_view(template_name="static_pages/terms.html"), name='terms'),
-
-    #url(r'^$',  RedirectView.as_view(url='about_us'), name='home'),
+    url(r'^aliases/$', TemplateView.as_view(template_name="static_pages/aliases.html"), name='aliases'),
 )

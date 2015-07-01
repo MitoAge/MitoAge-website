@@ -1,31 +1,99 @@
-{% extends 'browsing/generic_browsing.html' %}
+{% extends 'base.html' %}
 
 {% load staticfiles %}
+{% load bootstrap_pagination %}
 
 {% block subtitle %} | Browse genes {% endblock%}
 
-{% block page_title %}Browse genes {% endblock%}
+{% block content %}
+	<div class="container">
+		<h1>Browse genes</h1>
 
-{% block content_description %} 
-	<p>In total, our database contains information about {{paginator.count}} taxonomic classes:</p>
-{% endblock %}
-
-{% block browsing_content %}
-
-	<div class="row">
-		{% for taxonomy_class in object_list %}
-			<div class="col-md-4">
-			<li>
-				{% if taxonomy_class.number_of_species != 0 %}
-					<a href="{% url 'browse_class' taxonomy_class.pk %}">{{ taxonomy_class.name }}</a>
-				{% else %} 
-					{{ taxonomy_class }}
-				{% endif %} 
-				({{taxonomy_class.number_of_species}})
-			</li>
+		<div class="row">		
+			<div class="col-md-12 column">
+				<ul class="breadcrumb">
+					Browse stats: <li class="active">All genes</li>
+				</ul>
 			</div>
-		{% endfor %}
-	</div>
+		</div>
+
+		<h4>Mitochondrial protein coding genes: </h4>
+		<p>Please select one of the genes below to start browsing through the stats for that gene.<br/><br/></p>
+		
+		<div class="row">		
+			<div class="col-md-2">
+				<div width="50px">
+					<a class="btn btn-md btn-block btn-info" href="{% url 'stats' 'atp6' %}">ATP6</a>
+				</div>
+			</div>
+			<div class="col-md-2">
+				<div width="50px">
+					<a class="btn btn-md btn-block btn-info" href="{% url 'stats' 'atp8' %}">ATP8</a>
+				</div>
+			</div>
+			<div class="col-md-2">
+				<div width="50px">
+					<a class="btn btn-md btn-block btn-info" href="{% url 'stats' 'cox1' %}">COX1</a>
+				</div>
+			</div>
+			<div class="col-md-2">
+				<div width="50px">
+					<a class="btn btn-md btn-block btn-info" href="{% url 'stats' 'cox2' %}">COX2</a>
+				</div>
+			</div>
+			<div class="col-md-2">
+				<div width="50px">
+					<a class="btn btn-md btn-block btn-info" href="{% url 'stats' 'cox3' %}">COX3</a>
+				</div>
+			</div>
+			<div class="col-md-2">
+				<div width="50px">
+					<a class="btn btn-md btn-block btn-info" href="{% url 'stats' 'cytb' %}">CYTB</a>
+				</div>
+			</div>
+
+			<div class="col-md-12"> <br/> </div>
+
+			<div class="col-md-2">
+				<div width="50px">
+					<a class="btn btn-md btn-block btn-info" href="{% url 'stats' 'nd1' %}">ND1</a>
+				</div>
+			</div>
+			<div class="col-md-2">
+				<div width="50px">
+					<a class="btn btn-md btn-block btn-info" href="{% url 'stats' 'nd2' %}">ND2</a>
+				</div>
+			</div>
+			<div class="col-md-2">
+				<div width="50px">
+					<a class="btn btn-md btn-block btn-info" href="{% url 'stats' 'nd3' %}">ND3</a>
+				</div>
+			</div>
+			<div class="col-md-2">
+				<div width="50px">
+					<a class="btn btn-md btn-block btn-info" href="{% url 'stats' 'nd4' %}">ND4</a>
+				</div>
+			</div>
+			<div class="col-md-2">
+				<div width="50px">
+					<a class="btn btn-md btn-block btn-info" href="{% url 'stats' 'nd4l' %}">ND4L</a>
+				</div>
+			</div>
+			<div class="col-md-2">
+				<div width="50px">
+					<a class="btn btn-md btn-block btn-info" href="{% url 'stats' 'nd5' %}">ND5</a>
+				</div>
+			</div>
+			
+			<div class="col-md-12"> <br/> </div>
+
+			<div class="col-md-2">
+				<div width="50px">
+					<a class="btn btn-md btn-block btn-info" href="{% url 'stats' 'nd6' %}">ND6</a>
+				</div>
+			</div>
+
+		</div>
 {% endblock %}
 
 

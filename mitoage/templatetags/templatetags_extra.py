@@ -17,3 +17,6 @@ def base_composition_nice_title(key):
 def codon_usage_nice_title(key):
     return CodonUsage.get_nice_title(key)
 
+@register.filter
+def pluralize_taxonomy(key):
+    return {'species':'species', 'family':'families', 'order':'orders', 'class':'classes'}.get(key, key)

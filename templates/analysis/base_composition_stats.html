@@ -1,0 +1,55 @@
+{% load staticfiles %}
+
+{% load templatetags_extra %}
+
+{% if stats %}
+<table class="table">
+	<thead>
+		<tr>
+			<th colspan="8" class="text-center">Stats for {{stats.section|base_composition_nice_title}} (group size: {{stats.group_size}} species)</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td> </td>
+			<td class="text-center">GC (%)</td>
+			<td class="text-center">AT (%)</td>
+			<td class="text-center">G (bases)</td>
+			<td class="text-center">C (bases)</td>
+			<td class="text-center">A (bases)</td>
+			<td class="text-center">T (bases)</td>
+			<td class="text-center">Maximum lifespan (years)</td>
+		</tr>
+		<tr>
+			<td>Range (min-max)</td>
+			<td class="text-center">{{stats.min.gc}}% - {{stats.max.gc}}%</td>
+			<td class="text-center">{{stats.min.at}}% - {{stats.max.at}}%</td>
+			<td class="text-center">{{stats.min.g}} - {{stats.max.g}}</td>
+			<td class="text-center">{{stats.min.c}} - {{stats.max.c}}</td>
+			<td class="text-center">{{stats.min.a}} - {{stats.max.a}}</td>
+			<td class="text-center">{{stats.min.t}} - {{stats.max.t}}</td>
+			<td class="text-center">{{stats.min.lifespan| stringformat:'.1f'}} - {{stats.max.lifespan| stringformat:'.1f'}}</td>
+		</tr>
+		<tr>
+			<td>Median</td>
+			<td class="text-center">{{stats.median.gc}}%</td>
+			<td class="text-center">{{stats.median.at}}%</td>
+			<td class="text-center">{{stats.median.g}}</td>
+			<td class="text-center">{{stats.median.c}}</td>
+			<td class="text-center">{{stats.median.a}}</td>
+			<td class="text-center">{{stats.median.t}}</td>
+			<td class="text-center">{{stats.median.lifespan}}</td>
+		</tr>
+		<tr>
+			<td>Average &plusmn; stdev</td>
+			<td class="text-center">{{stats.mean.gc| stringformat:'.1f'}}% &plusmn; {{stats.stdev.gc| stringformat:'.1f'}}%</td>
+			<td class="text-center">{{stats.mean.at| stringformat:'.1f'}}% &plusmn; {{stats.stdev.at| stringformat:'.1f'}}%</td>
+			<td class="text-center">{{stats.mean.g| stringformat:'d'}} &plusmn; {{stats.stdev.g| stringformat:'d'}}</td>
+			<td class="text-center">{{stats.mean.c| stringformat:'d'}} &plusmn; {{stats.stdev.c| stringformat:'d'}}</td>
+			<td class="text-center">{{stats.mean.a| stringformat:'d'}} &plusmn; {{stats.stdev.a| stringformat:'d'}}</td>
+			<td class="text-center">{{stats.mean.t| stringformat:'d'}} &plusmn; {{stats.stdev.t| stringformat:'d'}}</td>
+			<td class="text-center">{{stats.mean.lifespan| stringformat:'.1f'}} &plusmn; {{stats.stdev.lifespan| stringformat:'.1f'}}</td>
+		</tr>
+	</tbody>
+</table>
+{% endif %}

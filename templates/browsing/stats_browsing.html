@@ -1,30 +1,72 @@
-{% extends 'browsing/generic_browsing.html' %}
+{% extends 'base.html' %}
 
 {% load staticfiles %}
+{% load templatetags_extra %}
+{% load bootstrap_pagination %}
 
 {% block subtitle %} | Stats for species {% endblock%}
 
-{% block page_title %} {{ title|safe }} {% endblock%}
+{% block content %}
+	<div class="container">
+		<h1>{{ title|safe }}</h1>
 
-{% block browse_title %}Stats:{% endblock%}
+		<div class="row">		
+			<div class="col-md-12 column">
+				<ul class="breadcrumb">
+					Browse stats: 
+					{% for crumb in breadcrumbs %}
+						{% if forloop.last %}
+							<li class="active">{{ crumb.name }}</li>
+						{% else %}
+							<li><a href="{{ crumb.url }}">{{ crumb.name }}</a> <span class="divider"></span></li>
+						{% endif %}
+					{% endfor %}
+				
+				</ul>
+			</div>
+		</div>
 
-
-{% block content_description %} 
-
-{% endblock %}
-
-{% block browsing_content %}
-
-	<div class="row">
-		{% if subtaxon %}
-			{% for entry in object_list %}
-				<div class="col-md-4">
-					<li>
-						<a href="{% url 'stats' entry.pk subtaxon %}"> {{ entry.name }} </a>
-					</li>
+		<div class="row">
+			<div class="col-md-2">
+				<div class="row">
+					<h5><b>{% if subtaxon == 'species' %}Species in family{% else %}Browsing {{subtaxon|pluralize_taxonomy}}{% endif %}:</b></h5>
 				</div>
-			{% endfor %}
-		{% endif %}
-	</div>
+				<div class="row">
+					{% for entry in object_list %}
+						{% if subtaxon and subtaxon != 'species' %}
+							{% if gene %}
+								<a href="{% url 'stats' entry.pk subtaxon gene %}"> {{ entry.name }} </a>({{entry.number_of_species}})<br/>
+							{% else %}
+								<a href="{% url 'stats' entry.pk subtaxon %}"> {{ entry.name }} </a>({{entry.number_of_species}})<br/>
+							{% endif %}
+						{% else %}
+							{{entry.name}}<br/>
+						{% endif %}
+					{% endfor %}
+				</div>
+					{% if is_paginated %}
+						{% bootstrap_paginate page_obj range=2 show_prev_next="true" show_first_last="false" previous_label="<" next_label=">" first_label="<<" last_label=">>"%}
+					{% endif %}
+			</div>
+			
+			<div class="col-md-10">
+				{% for s in stats %}
+				<div class="panel panel-default base-composition-panel-body">
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-md-12">
+								{% include "analysis/base_composition_stats.html" with stats=s %}
+							</div>
+						</div>
+					</div>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
 
-{% endblock %}
+	
+
+		
+	</div>
+{% endblock%}
+

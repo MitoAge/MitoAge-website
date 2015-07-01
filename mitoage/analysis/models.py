@@ -1,7 +1,10 @@
+from decimal import Decimal
+import math
+
 from django.db import models
 
 from mitoage.taxonomy.models import TaxonomySpecies
-import math
+
 
 def median(lst):
     lst = sorted(lst)
@@ -13,18 +16,32 @@ def median(lst):
         return float(sum(lst[(len(lst)/2)-1:(len(lst)/2)+1]))/2.0
 
 def average(lst):
-    return sum(list)*1.0/len(lst)
+    return float(sum(lst))/len(lst)
 
 def stdev(lst):
     avg = average(lst)
-    variance = map(lambda x: (x - avg)**2, lst)
+    variance = map(lambda x: (float(x) - avg)**2, lst)
     return math.sqrt(average(variance))
 
 class BaseCompositionStats():
     def __init__(self, species, section):
         self.section = section
+
+        import time
+        start = time.time()
         
-        compositions = [a_species.get_base_composition(section) for a_species in species if a_species is not None]
+        self.compute_stats(species, section)
+        # should compute correlations here
+        end = time.time()
+        self.elapsed_time = end - start        
+         
+    def compute_stats(self, species, section):
+        mitoage_entries = MitoAgeEntry.objects.filter(species__pk__in=species)
+
+        compositions = [entry.get_base_composition(section) for entry in mitoage_entries]
+        compositions = [x for x in compositions if (not x.is_empty()) and (x is not None)]
+        self.group_size = len(compositions) 
+        
         # prep all the lists
         self.g = [entry.g for entry in compositions]
         self.c = [entry.c for entry in compositions]
@@ -39,16 +56,18 @@ class BaseCompositionStats():
         self.gc = [entry.gc_percent() for entry in compositions]
         self.at = [entry.at_percent() for entry in compositions]
 
-        # compute simple stats for all the lists
-        self.min = { "g":min(self.g), "c":min(self.c), "a":min(self.a), "t":min(self.t), "g_1kb":min(self.g_1kb), "c_1kb":min(self.c_1kb), "a_1kb":min(self.a_1kb), "t_1kb":min(self.t_1kb), "gc":min(self.gc), "at":min(self.at)} 
-        self.max = { "g":max(self.g), "c":max(self.c), "a":max(self.a), "t":max(self.t), "g_1kb":max(self.g_1kb), "c_1kb":max(self.c_1kb), "a_1kb":max(self.a_1kb), "t_1kb":max(self.t_1kb), "gc":max(self.gc), "at":max(self.at)} 
-        self.mean = { "g":average(self.g), "c":average(self.c), "a":average(self.a), "t":average(self.t), "g_1kb":average(self.g_1kb), "c_1kb":average(self.c_1kb), "a_1kb":average(self.a_1kb), "t_1kb":average(self.t_1kb), "gc":average(self.gc), "at":average(self.at)} 
-        self.stdev = { "g":stdev(self.g), "c":stdev(self.c), "a":stdev(self.a), "t":stdev(self.t), "g_1kb":stdev(self.g_1kb), "c_1kb":stdev(self.c_1kb), "a_1kb":stdev(self.a_1kb), "t_1kb":stdev(self.t_1kb), "gc":stdev(self.gc), "at":stdev(self.at)} 
-        self.median = { "g":median(self.g), "c":median(self.c), "a":median(self.a), "t":median(self.t), "g_1kb":median(self.g_1kb), "c_1kb":median(self.c_1kb), "a_1kb":median(self.a_1kb), "t_1kb":median(self.t_1kb), "gc":median(self.gc), "at":median(self.at)} 
+        self.lifespans = [entry.species.lifespan for entry in mitoage_entries] 
 
-        lifespans = [a_species.lifespan for a_species in species if a_species is not None]
-        # compute correlations here
+        # compute simple stats for all the lists
+        self.min = { "g":min(self.g), "c":min(self.c), "a":min(self.a), "t":min(self.t), "g_1kb":min(self.g_1kb), "c_1kb":min(self.c_1kb), "a_1kb":min(self.a_1kb), "t_1kb":min(self.t_1kb), "gc":min(self.gc), "at":min(self.at), "lifespan":min(self.lifespans)} 
+        self.max = { "g":max(self.g), "c":max(self.c), "a":max(self.a), "t":max(self.t), "g_1kb":max(self.g_1kb), "c_1kb":max(self.c_1kb), "a_1kb":max(self.a_1kb), "t_1kb":max(self.t_1kb), "gc":max(self.gc), "at":max(self.at), "lifespan":max(self.lifespans)} 
+        self.mean = { "g":average(self.g), "c":average(self.c), "a":average(self.a), "t":average(self.t), "g_1kb":average(self.g_1kb), "c_1kb":average(self.c_1kb), "a_1kb":average(self.a_1kb), "t_1kb":average(self.t_1kb), "gc":average(self.gc), "at":average(self.at), "lifespan":average(self.lifespans)} 
+        self.stdev = { "g":stdev(self.g), "c":stdev(self.c), "a":stdev(self.a), "t":stdev(self.t), "g_1kb":stdev(self.g_1kb), "c_1kb":stdev(self.c_1kb), "a_1kb":stdev(self.a_1kb), "t_1kb":stdev(self.t_1kb), "gc":stdev(self.gc), "at":stdev(self.at), "lifespan":stdev(self.lifespans)} 
+        self.median = { "g":int(median(self.g)), "c":int(median(self.c)), "a":int(median(self.a)), "t":int(median(self.t)), "g_1kb":int(median(self.g_1kb)), "c_1kb":int(median(self.c_1kb)), "a_1kb":int(median(self.a_1kb)), "t_1kb":int(median(self.t_1kb)), "gc":median(self.gc), "at":median(self.at), "lifespan":median(self.lifespans)} 
+        
          
+    def to_string(self):
+        return "n:%s, min:%s, max:%s, mean:%s, stdev:%s, median:%s" % (self.group_size, self.min, self.max, self.mean, self.stdev, self.median)
         
 
 class BaseComposition():
@@ -94,7 +113,10 @@ class BaseComposition():
         return self.size==other.size and self.g==other.g and self.c==other.c and self.a==other.a and self.t==other.t and self.others==other.others 
 
     def is_empty(self):
-        return self.size==None and self.g==None and self.c==None and self.a==None and self.t==None and self.others==None 
+        return self.is_full_of_0() or self.size==None and self.g==None and self.c==None and self.a==None and self.t==None and self.others==None 
+
+    def is_full_of_0(self):
+        return self.size==0 and self.g==0 and self.c==0 and self.a==0 and self.t==0 and self.others==0 
 
     def to_raw_data(self):
         return (self.size, self.g, self.c, self.a, self.t, self.others)

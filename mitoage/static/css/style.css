@@ -46,3 +46,10 @@
 .base-composition-panel-body {
 	background:#E6FCED;
 }
+
+.pubmed {
+  display: inline-block;
+  text-indent: -1000em;
+  width: 45px;
+  background: url(http://www.nlm.nih.gov/share/image/pubmed.gif) no-repeat;
+}
