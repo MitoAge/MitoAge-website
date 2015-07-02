@@ -35,7 +35,7 @@
 			      </tr>
 			      {% if object.hagr_id %}
 			      <tr>
-			        <td>Lifespan@AnAge</td>
+			        <td>Maximum lifespan</td>
 			        <td>{% if object.lifespan %}{{ object.lifespan| stringformat:'.1f' }} years ({{ object.link_to_hagr|safe }}){% else %}<i>Not recorded</i> ({{ object.hagr_id }}){% endif %}</td>
 			      </tr>
 			      {% endif %}

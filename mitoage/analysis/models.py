@@ -2,6 +2,7 @@ from decimal import Decimal
 import math
 
 from django.db import models
+from django.db.models.aggregates import Avg, Max, Min, StdDev, Variance
 
 from mitoage.taxonomy.models import TaxonomySpecies
 
@@ -14,6 +15,12 @@ def median(lst):
         return lst[((len(lst)+1)/2)-1]
     else:
         return float(sum(lst[(len(lst)/2)-1:(len(lst)/2)+1]))/2.0
+
+def median_value(queryset,term):
+    count = queryset.count()
+    if count==0:
+        return "-"
+    return queryset.values_list(term, flat=True).order_by(term)[int(round(count/2))]
 
 def average(lst):
     return float(sum(lst))/len(lst)
@@ -30,11 +37,102 @@ class BaseCompositionStats():
         import time
         start = time.time()
         
-        self.compute_stats(species, section)
-        # should compute correlations here
+        #self.compute_stats(species, section)            TO BE DELETED SOONISH
+        self.compute_stats2(species, section)
+
         end = time.time()
         self.elapsed_time = end - start        
-         
+
+    def compute_stats2(self, species, section):
+        section_translation = {'total_mtDNA':'total_mtDNA', 'total_pc_mtDNA':'total_mtDNA_pc', 'd_loop_mtDNA':'d_loop', 
+                               'total_tRNA_mtDNA':'total_tRNA', 'total_rRNA_mtDNA':'total_rRNA', 'atp6':'atp6', 'atp8':'atp8', 
+                               'cox1':'cox1', 'cox2':'cox2', 'cox3':'cox3', 'cytb':'cytb', 'nd1':'nd1', 'nd2':'nd2', 'nd3':'nd3', 
+                               'nd4':'nd4', 'nd4l':'nd4l', 'nd5':'nd5', 'nd6':'nd6', 'rRNA_12S':'rRNA_12S', 'rRNA_16S':'rRNA_16S'}.get(section, 'total_mtDNA')
+        section_prefix = "bc_%s_" % section_translation
+
+        self.min = {} 
+        self.max = {} 
+        self.mean = {} 
+        self.stdev = {} 
+        self.median = {} 
+        self.coef_var = {} 
+
+        kwargs1 = { ('%ssize__isnull' % section_prefix): 'True', }
+        kwargs2 = { ('%ssize__exact' % section_prefix): '0', }
+        mitoage_entries = MitoAgeEntry.objects.filter(species__pk__in=species).exclude(**kwargs1).exclude(**kwargs2)
+        self.group_size = mitoage_entries.count()
+
+        self.compute_stats_for("g", section_prefix, mitoage_entries) 
+        self.compute_stats_for("c", section_prefix, mitoage_entries) 
+        self.compute_stats_for("a", section_prefix, mitoage_entries) 
+        self.compute_stats_for("t", section_prefix, mitoage_entries) 
+        self.compute_stats_for("lifespan", "species__", mitoage_entries)
+        
+        from django.db import connection
+        cursor = connection.cursor()
+        fake_query = str(mitoage_entries.annotate(x=Min("%sg" % section_prefix)).query)
+        from_query = fake_query[fake_query.find('FROM'):fake_query.find('GROUP BY')]
+
+        self.additional_column = '(("analysis_mitoageentry"."%sg" + "analysis_mitoageentry"."%sc")*100.0/"analysis_mitoageentry"."%ssize")' % (section_prefix, section_prefix, section_prefix)
+        self.compute_stats_through_direct_queries(cursor, "gc", from_query, self.additional_column)
+        
+        self.additional_column = '(("analysis_mitoageentry"."%sa" + "analysis_mitoageentry"."%st")*100.0/"analysis_mitoageentry"."%ssize")' % (section_prefix, section_prefix, section_prefix)
+        self.compute_stats_through_direct_queries(cursor, "at", from_query, self.additional_column)
+        
+        #mitoage_entries = MitoAgeEntry.objects.filter(species__pk__in=species).extra( select = {'gc': self.additional_column} )
+        #self.results = mitoage_entries.values('gc').aggregate(gc=Avg("gc"))
+        #self.results = MitoAgeEntry.objects.raw('SELECT avg(%s) FROM analysis_mitoageentry WHERE "analysis_mitoageentry"."species_id" IN (SELECT "taxonomy_taxonomyspecies"."id" FROM "taxonomy_taxonomyspecies")' % self.additional_column)
+        #self.query = mitoage_entries.annotate(gc=Min(self.additional_column)).query
+        #self.updated_entries = mitoage_entries.annotate(gc = (F("%s_g" % section_prefix) + F("%s_c" % section_prefix)) )
+
+
+    def compute_stats_through_direct_queries(self, cursor, field_name, from_query, column):
+        cursor.execute('SELECT min%s %s' % (column, from_query) )
+        self.min[field_name] = cursor.fetchone()[0]
+        cursor.execute('SELECT max%s %s' % (column, from_query) )
+        self.max[field_name] = cursor.fetchone()[0]
+        cursor.execute('SELECT avg%s %s' % (column, from_query) )
+        self.mean[field_name] = cursor.fetchone()[0]
+        cursor.execute('SELECT stddev%s %s' % (column, from_query) )
+        self.stdev[field_name] = cursor.fetchone()[0]
+
+        self.median[field_name] = self.compute_median_with_direct_queries(cursor, from_query, column)[0]
+        self.compute_coef_of_variance(field_name)
+
+    
+    def compute_median_with_direct_queries(self, cursor, from_query, column):
+        cursor.execute('SELECT count%s %s' % (column, from_query) )
+        count = cursor.fetchone()[0]
+        if count==0:
+            return "-"
+        query = 'SELECT %s %s ORDER BY %s' % (column, from_query, column)
+        cursor.execute(query)
+        return cursor.fetchall()[int(round(count/2))]
+
+    def compute_coef_of_variance(self, field_name):    
+        if self.stdev[field_name]:
+            self.coef_var[field_name] = self.stdev[field_name]*self.stdev[field_name] / self.mean[field_name]
+        else:
+            self.coef_var[field_name] = None
+
+    
+    def compute_stats_for(self, field_name, section_prefix, entries):
+        full_field_name = section_prefix + field_name
+        results = entries.aggregate(average_value = Avg(full_field_name), stdev_value = StdDev(full_field_name), max_value = Max(full_field_name), min_value = Min(full_field_name), variance_value =Variance(full_field_name))
+        self.min[field_name] = results['min_value']
+        self.max[field_name] = results['max_value']
+        self.mean[field_name] = results['average_value']
+        self.stdev[field_name] = results['stdev_value']
+        self.median[field_name] = median_value(entries,full_field_name)
+        self.compute_coef_of_variance(field_name)
+        #self.coef_var[field_name] = results['variance_value']*1.0 / results['average_value']
+        #self.sum[field_name] = results['sum_value']
+    
+    
+    
+    
+    # - initial implementation, highly inneficient 
+    # - loads entries in memory and afterwards computes the statistics values - see compute_stats2 which uses aggregates
     def compute_stats(self, species, section):
         mitoage_entries = MitoAgeEntry.objects.filter(species__pk__in=species)
 
@@ -556,69 +654,69 @@ class MitoAgeEntry(models.Model):
 
     def get_base_composition(self, type_of_bc):
         return {
-            'total_mtDNA': BaseComposition(self.bc_total_mtDNA_size, self.bc_total_mtDNA_g, self.bc_total_mtDNA_c, self.bc_total_mtDNA_t, self.bc_total_mtDNA_a, self.bc_total_mtDNA_others),
-            'total_pc_mtDNA': BaseComposition(self.bc_total_mtDNA_pc_size, self.bc_total_mtDNA_pc_g, self.bc_total_mtDNA_pc_c, self.bc_total_mtDNA_pc_t, self.bc_total_mtDNA_pc_a, self.bc_total_mtDNA_bc_others),
-            'd_loop_mtDNA': BaseComposition(self.bc_d_loop_size, self.bc_d_loop_g, self.bc_d_loop_c, self.bc_d_loop_t, self.bc_d_loop_a, self.bc_d_loop_others),
-            'total_tRNA_mtDNA': BaseComposition(self.bc_total_tRNA_size, self.bc_total_tRNA_g, self.bc_total_tRNA_c, self.bc_total_tRNA_t, self.bc_total_tRNA_a, self.bc_total_tRNA_others),
-            'total_rRNA_mtDNA': BaseComposition(self.bc_total_rRNA_size, self.bc_total_rRNA_g, self.bc_total_rRNA_c, self.bc_total_rRNA_t, self.bc_total_rRNA_a, self.bc_total_rRNA_others),
-            'atp6': BaseComposition(self.bc_atp6_size, self.bc_atp6_g, self.bc_atp6_c, self.bc_atp6_t, self.bc_atp6_a, self.bc_atp6_others),
-            'atp8': BaseComposition(self.bc_atp8_size, self.bc_atp8_g, self.bc_atp8_c, self.bc_atp8_t, self.bc_atp8_a, self.bc_atp8_others),
-            'cox1': BaseComposition(self.bc_cox1_size, self.bc_cox1_g, self.bc_cox1_c, self.bc_cox1_t, self.bc_cox1_a, self.bc_cox1_others),
-            'cox2': BaseComposition(self.bc_cox2_size, self.bc_cox2_g, self.bc_cox2_c, self.bc_cox2_t, self.bc_cox2_a, self.bc_cox2_others),
-            'cox3': BaseComposition(self.bc_cox3_size, self.bc_cox3_g, self.bc_cox3_c, self.bc_cox3_t, self.bc_cox3_a, self.bc_cox3_others),
-            'cytb': BaseComposition(self.bc_cytb_size, self.bc_cytb_g, self.bc_cytb_c, self.bc_cytb_t, self.bc_cytb_a, self.bc_cytb_others),
-            'nd1': BaseComposition(self.bc_nd1_size, self.bc_nd1_g, self.bc_nd1_c, self.bc_nd1_t, self.bc_nd1_a, self.bc_nd1_others),
-            'nd2': BaseComposition(self.bc_nd2_size, self.bc_nd2_g, self.bc_nd2_c, self.bc_nd2_t, self.bc_nd2_a, self.bc_nd2_others),
-            'nd3': BaseComposition(self.bc_nd3_size, self.bc_nd3_g, self.bc_nd3_c, self.bc_nd3_t, self.bc_nd3_a, self.bc_nd3_others),
-            'nd4': BaseComposition(self.bc_nd4_size, self.bc_nd4_g, self.bc_nd4_c, self.bc_nd4_t, self.bc_nd4_a, self.bc_nd4_others),
-            'nd4l': BaseComposition(self.bc_nd4l_size, self.bc_nd4l_g, self.bc_nd4l_c, self.bc_nd4l_t, self.bc_nd4l_a, self.bc_nd4l_others),
-            'nd5': BaseComposition(self.bc_nd5_size, self.bc_nd5_g, self.bc_nd5_c, self.bc_nd5_t, self.bc_nd5_a, self.bc_nd5_others),
-            'nd6': BaseComposition(self.bc_nd6_size, self.bc_nd6_g, self.bc_nd6_c, self.bc_nd6_t, self.bc_nd6_a, self.bc_nd6_others),
-            'rRNA_12S': BaseComposition(self.bc_rRNA_12S_size, self.bc_rRNA_12S_g, self.bc_rRNA_12S_c, self.bc_rRNA_12S_t, self.bc_rRNA_12S_a, self.bc_rRNA_12S_others),
-            'rRNA_16S': BaseComposition(self.bc_rRNA_16S_size, self.bc_rRNA_16S_g, self.bc_rRNA_16S_c, self.bc_rRNA_16S_t, self.bc_rRNA_16S_a, self.bc_rRNA_16S_others),
+            'total_mtDNA': BaseComposition(self.bc_total_mtDNA_size, self.bc_total_mtDNA_g, self.bc_total_mtDNA_c, self.bc_total_mtDNA_a, self.bc_total_mtDNA_t, self.bc_total_mtDNA_others),
+            'total_pc_mtDNA': BaseComposition(self.bc_total_mtDNA_pc_size, self.bc_total_mtDNA_pc_g, self.bc_total_mtDNA_pc_c, self.bc_total_mtDNA_pc_a, self.bc_total_mtDNA_pc_t, self.bc_total_mtDNA_bc_others),
+            'd_loop_mtDNA': BaseComposition(self.bc_d_loop_size, self.bc_d_loop_g, self.bc_d_loop_c, self.bc_d_loop_a, self.bc_d_loop_t, self.bc_d_loop_others),
+            'total_tRNA_mtDNA': BaseComposition(self.bc_total_tRNA_size, self.bc_total_tRNA_g, self.bc_total_tRNA_c, self.bc_total_tRNA_a, self.bc_total_tRNA_t, self.bc_total_tRNA_others),
+            'total_rRNA_mtDNA': BaseComposition(self.bc_total_rRNA_size, self.bc_total_rRNA_g, self.bc_total_rRNA_c, self.bc_total_rRNA_a, self.bc_total_rRNA_t, self.bc_total_rRNA_others),
+            'atp6': BaseComposition(self.bc_atp6_size, self.bc_atp6_g, self.bc_atp6_c, self.bc_atp6_a, self.bc_atp6_t, self.bc_atp6_others),
+            'atp8': BaseComposition(self.bc_atp8_size, self.bc_atp8_g, self.bc_atp8_c, self.bc_atp8_a, self.bc_atp8_t, self.bc_atp8_others),
+            'cox1': BaseComposition(self.bc_cox1_size, self.bc_cox1_g, self.bc_cox1_c, self.bc_cox1_a, self.bc_cox1_t, self.bc_cox1_others),
+            'cox2': BaseComposition(self.bc_cox2_size, self.bc_cox2_g, self.bc_cox2_c, self.bc_cox2_a, self.bc_cox2_t, self.bc_cox2_others),
+            'cox3': BaseComposition(self.bc_cox3_size, self.bc_cox3_g, self.bc_cox3_c, self.bc_cox3_a, self.bc_cox3_t, self.bc_cox3_others),
+            'cytb': BaseComposition(self.bc_cytb_size, self.bc_cytb_g, self.bc_cytb_c, self.bc_cytb_a, self.bc_cytb_t, self.bc_cytb_others),
+            'nd1': BaseComposition(self.bc_nd1_size, self.bc_nd1_g, self.bc_nd1_c, self.bc_nd1_a, self.bc_nd1_t, self.bc_nd1_others),
+            'nd2': BaseComposition(self.bc_nd2_size, self.bc_nd2_g, self.bc_nd2_c, self.bc_nd2_a, self.bc_nd2_t, self.bc_nd2_others),
+            'nd3': BaseComposition(self.bc_nd3_size, self.bc_nd3_g, self.bc_nd3_c, self.bc_nd3_a, self.bc_nd3_t, self.bc_nd3_others),
+            'nd4': BaseComposition(self.bc_nd4_size, self.bc_nd4_g, self.bc_nd4_c, self.bc_nd4_a, self.bc_nd4_t, self.bc_nd4_others),
+            'nd4l': BaseComposition(self.bc_nd4l_size, self.bc_nd4l_g, self.bc_nd4l_c, self.bc_nd4l_a, self.bc_nd4l_t, self.bc_nd4l_others),
+            'nd5': BaseComposition(self.bc_nd5_size, self.bc_nd5_g, self.bc_nd5_c, self.bc_nd5_a, self.bc_nd5_t, self.bc_nd5_others),
+            'nd6': BaseComposition(self.bc_nd6_size, self.bc_nd6_g, self.bc_nd6_c, self.bc_nd6_a, self.bc_nd6_t, self.bc_nd6_others),
+            'rRNA_12S': BaseComposition(self.bc_rRNA_12S_size, self.bc_rRNA_12S_g, self.bc_rRNA_12S_c, self.bc_rRNA_12S_a, self.bc_rRNA_12S_t, self.bc_rRNA_12S_others),
+            'rRNA_16S': BaseComposition(self.bc_rRNA_16S_size, self.bc_rRNA_16S_g, self.bc_rRNA_16S_c, self.bc_rRNA_16S_a, self.bc_rRNA_16S_t, self.bc_rRNA_16S_others),
         }[type_of_bc]
     
     def set_base_composition(self, type_of_bc, base_composition):
         if type_of_bc=='total_mtDNA':
-            (self.bc_total_mtDNA_size, self.bc_total_mtDNA_g, self.bc_total_mtDNA_c, self.bc_total_mtDNA_t, self.bc_total_mtDNA_a, self.bc_total_mtDNA_others) = base_composition.to_raw_data()
+            (self.bc_total_mtDNA_size, self.bc_total_mtDNA_g, self.bc_total_mtDNA_c, self.bc_total_mtDNA_a, self.bc_total_mtDNA_t, self.bc_total_mtDNA_others) = base_composition.to_raw_data()
         if type_of_bc=='total_pc_mtDNA':
-            (self.bc_total_mtDNA_pc_size, self.bc_total_mtDNA_pc_g, self.bc_total_mtDNA_pc_c, self.bc_total_mtDNA_pc_t, self.bc_total_mtDNA_pc_a, self.bc_total_mtDNA_bc_others) = base_composition.to_raw_data()
+            (self.bc_total_mtDNA_pc_size, self.bc_total_mtDNA_pc_g, self.bc_total_mtDNA_pc_c, self.bc_total_mtDNA_pc_a, self.bc_total_mtDNA_pc_t, self.bc_total_mtDNA_bc_others) = base_composition.to_raw_data()
         if type_of_bc=='d_loop_mtDNA':
-            (self.bc_d_loop_size, self.bc_d_loop_g, self.bc_d_loop_c, self.bc_d_loop_t, self.bc_d_loop_a, self.bc_d_loop_others) = base_composition.to_raw_data()
+            (self.bc_d_loop_size, self.bc_d_loop_g, self.bc_d_loop_c, self.bc_d_loop_a, self.bc_d_loop_t, self.bc_d_loop_others) = base_composition.to_raw_data()
         if type_of_bc=='total_tRNA_mtDNA':
-            (self.bc_total_tRNA_size, self.bc_total_tRNA_g, self.bc_total_tRNA_c, self.bc_total_tRNA_t, self.bc_total_tRNA_a, self.bc_total_tRNA_others) = base_composition.to_raw_data()
+            (self.bc_total_tRNA_size, self.bc_total_tRNA_g, self.bc_total_tRNA_c, self.bc_total_tRNA_a, self.bc_total_tRNA_t, self.bc_total_tRNA_others) = base_composition.to_raw_data()
         if type_of_bc=='total_rRNA_mtDNA':
-            (self.bc_total_rRNA_size, self.bc_total_rRNA_g, self.bc_total_rRNA_c, self.bc_total_rRNA_t, self.bc_total_rRNA_a, self.bc_total_rRNA_others) = base_composition.to_raw_data()
+            (self.bc_total_rRNA_size, self.bc_total_rRNA_g, self.bc_total_rRNA_c, self.bc_total_rRNA_a, self.bc_total_rRNA_t, self.bc_total_rRNA_others) = base_composition.to_raw_data()
         if type_of_bc=='atp6':
-            (self.bc_atp6_size, self.bc_atp6_g, self.bc_atp6_c, self.bc_atp6_t, self.bc_atp6_a, self.bc_atp6_others) = base_composition.to_raw_data()
+            (self.bc_atp6_size, self.bc_atp6_g, self.bc_atp6_c, self.bc_atp6_a, self.bc_atp6_t, self.bc_atp6_others) = base_composition.to_raw_data()
         if type_of_bc=='atp8':
-            (self.bc_atp8_size, self.bc_atp8_g, self.bc_atp8_c, self.bc_atp8_t, self.bc_atp8_a, self.bc_atp8_others) = base_composition.to_raw_data()
+            (self.bc_atp8_size, self.bc_atp8_g, self.bc_atp8_c, self.bc_atp8_a, self.bc_atp8_t, self.bc_atp8_others) = base_composition.to_raw_data()
         if type_of_bc=='cox1':
-            (self.bc_cox1_size, self.bc_cox1_g, self.bc_cox1_c, self.bc_cox1_t, self.bc_cox1_a, self.bc_cox1_others) = base_composition.to_raw_data()
+            (self.bc_cox1_size, self.bc_cox1_g, self.bc_cox1_c, self.bc_cox1_a, self.bc_cox1_t, self.bc_cox1_others) = base_composition.to_raw_data()
         if type_of_bc=='cox2':
-            (self.bc_cox2_size, self.bc_cox2_g, self.bc_cox2_c, self.bc_cox2_t, self.bc_cox2_a, self.bc_cox2_others) = base_composition.to_raw_data()
+            (self.bc_cox2_size, self.bc_cox2_g, self.bc_cox2_c, self.bc_cox2_a, self.bc_cox2_t, self.bc_cox2_others) = base_composition.to_raw_data()
         if type_of_bc=='cox3':
-            (self.bc_cox3_size, self.bc_cox3_g, self.bc_cox3_c, self.bc_cox3_t, self.bc_cox3_a, self.bc_cox3_others) = base_composition.to_raw_data()
+            (self.bc_cox3_size, self.bc_cox3_g, self.bc_cox3_c, self.bc_cox3_a, self.bc_cox3_t, self.bc_cox3_others) = base_composition.to_raw_data()
         if type_of_bc=='cytb':
-            (self.bc_cytb_size, self.bc_cytb_g, self.bc_cytb_c, self.bc_cytb_t, self.bc_cytb_a, self.bc_cytb_others) = base_composition.to_raw_data()
+            (self.bc_cytb_size, self.bc_cytb_g, self.bc_cytb_c, self.bc_cytb_a, self.bc_cytb_t, self.bc_cytb_others) = base_composition.to_raw_data()
         if type_of_bc=='nd1':
-            (self.bc_nd1_size, self.bc_nd1_g, self.bc_nd1_c, self.bc_nd1_t, self.bc_nd1_a, self.bc_nd1_others) = base_composition.to_raw_data()
+            (self.bc_nd1_size, self.bc_nd1_g, self.bc_nd1_c, self.bc_nd1_a, self.bc_nd1_t, self.bc_nd1_others) = base_composition.to_raw_data()
         if type_of_bc=='nd2':
-            (self.bc_nd2_size, self.bc_nd2_g, self.bc_nd2_c, self.bc_nd2_t, self.bc_nd2_a, self.bc_nd2_others) = base_composition.to_raw_data()
+            (self.bc_nd2_size, self.bc_nd2_g, self.bc_nd2_c, self.bc_nd2_a, self.bc_nd2_t, self.bc_nd2_others) = base_composition.to_raw_data()
         if type_of_bc=='nd3':
-            (self.bc_nd3_size, self.bc_nd3_g, self.bc_nd3_c, self.bc_nd3_t, self.bc_nd3_a, self.bc_nd3_others) = base_composition.to_raw_data()
+            (self.bc_nd3_size, self.bc_nd3_g, self.bc_nd3_c, self.bc_nd3_a, self.bc_nd3_t, self.bc_nd3_others) = base_composition.to_raw_data()
         if type_of_bc=='nd4':
-            (self.bc_nd4_size, self.bc_nd4_g, self.bc_nd4_c, self.bc_nd4_t, self.bc_nd4_a, self.bc_nd4_others) = base_composition.to_raw_data()
+            (self.bc_nd4_size, self.bc_nd4_g, self.bc_nd4_c, self.bc_nd4_a, self.bc_nd4_t, self.bc_nd4_others) = base_composition.to_raw_data()
         if type_of_bc=='nd4l':
-            (self.bc_nd4l_size, self.bc_nd4l_g, self.bc_nd4l_c, self.bc_nd4l_t, self.bc_nd4l_a, self.bc_nd4l_others) = base_composition.to_raw_data()
+            (self.bc_nd4l_size, self.bc_nd4l_g, self.bc_nd4l_c, self.bc_nd4l_a, self.bc_nd4l_t, self.bc_nd4l_others) = base_composition.to_raw_data()
         if type_of_bc=='nd5':
-            (self.bc_nd5_size, self.bc_nd5_g, self.bc_nd5_c, self.bc_nd5_t, self.bc_nd5_a, self.bc_nd5_others) = base_composition.to_raw_data()
+            (self.bc_nd5_size, self.bc_nd5_g, self.bc_nd5_c, self.bc_nd5_a, self.bc_nd5_t, self.bc_nd5_others) = base_composition.to_raw_data()
         if type_of_bc=='nd6':
-            (self.bc_nd6_size, self.bc_nd6_g, self.bc_nd6_c, self.bc_nd6_t, self.bc_nd6_a, self.bc_nd6_others) = base_composition.to_raw_data()
+            (self.bc_nd6_size, self.bc_nd6_g, self.bc_nd6_c, self.bc_nd6_a, self.bc_nd6_t, self.bc_nd6_others) = base_composition.to_raw_data()
         if type_of_bc=='rRNA_12S':
-            (self.bc_rRNA_12S_size, self.bc_rRNA_12S_g, self.bc_rRNA_12S_c, self.bc_rRNA_12S_t, self.bc_rRNA_12S_a, self.bc_rRNA_12S_others) = base_composition.to_raw_data()
+            (self.bc_rRNA_12S_size, self.bc_rRNA_12S_g, self.bc_rRNA_12S_c, self.bc_rRNA_12S_a, self.bc_rRNA_12S_t, self.bc_rRNA_12S_others) = base_composition.to_raw_data()
         if type_of_bc=='rRNA_16S':
-            (self.bc_rRNA_16S_size, self.bc_rRNA_16S_g, self.bc_rRNA_16S_c, self.bc_rRNA_16S_t, self.bc_rRNA_16S_a, self.bc_rRNA_16S_others) = base_composition.to_raw_data()
+            (self.bc_rRNA_16S_size, self.bc_rRNA_16S_g, self.bc_rRNA_16S_c, self.bc_rRNA_16S_a, self.bc_rRNA_16S_t, self.bc_rRNA_16S_others) = base_composition.to_raw_data()
         
     
     def get_codon_usage(self, type_of_cu):
