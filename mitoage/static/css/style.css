@@ -53,3 +53,23 @@
   width: 45px;
   background: url(http://www.nlm.nih.gov/share/image/pubmed.gif) no-repeat;
 }
+
+.green_flame > a:link, .green_flame > li > a:visited {
+    color: #0f9d58;
+}
+
+.navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
+    color: #0C7E46;
+}
+
+.navbar-default .navbar-nav > .open{
+    color: #0C7E46;
+	background: #E6F2ED;
+ }
+
+.navbar-default .navbar-nav > .open > a, 
+.navbar-default .navbar-nav > .open > a:hover, 
+.navbar-default .navbar-nav > .open > a:focus {
+	color: #0C7E46;
+	background: #E6F2ED;
+}
