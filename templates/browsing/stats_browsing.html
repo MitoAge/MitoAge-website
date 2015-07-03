@@ -40,7 +40,7 @@
 								<a href="{% url 'stats' entry.pk subtaxon %}"> {{ entry.name }} </a>({{entry.number_of_species}})<br/>
 							{% endif %}
 						{% else %}
-							{{entry.name}}<br/>
+							<a href="{% url 'view_species' entry.pk %}">{{ entry.name }}</a> <br/>
 						{% endif %}
 					{% endfor %}
 				</div>

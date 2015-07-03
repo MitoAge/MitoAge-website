@@ -1,3 +1,5 @@
+from itertools import chain
+
 from django.core.context_processors import request
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.core.urlresolvers import reverse_lazy
@@ -49,7 +51,7 @@ class BrowseAllClassesList(ListView):
 class TaxonomyClassDetail(SingleObjectMixin, ListView):
     template_name = "browsing/taxonomy_class_detail.html"
     model = TaxonomyClass
-    paginate_by = 45
+    paginate_by = 15
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=TaxonomyClass.objects.all())
@@ -68,7 +70,7 @@ class TaxonomyClassDetail(SingleObjectMixin, ListView):
 class TaxonomyOrderDetail(SingleObjectMixin, ListView):
     template_name = "browsing/taxonomy_order_detail.html"
     model = TaxonomyOrder
-    paginate_by = 45
+    paginate_by = 15
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=TaxonomyOrder.objects.all())
@@ -88,7 +90,7 @@ class TaxonomyOrderDetail(SingleObjectMixin, ListView):
 class TaxonomyFamilyDetail(SingleObjectMixin, ListView):
     template_name = "browsing/taxonomy_family_detail.html"
     model = TaxonomyFamily
-    paginate_by = 45
+    paginate_by = 15
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=TaxonomyFamily.objects.all())
@@ -259,7 +261,14 @@ def search(request):
     if ('q' in request.GET) and request.GET['q'].strip():
         query_string = request.GET['q']
         entry_query = get_query(query_string, ['name', 'common_name',])
-        all_entries = TaxonomySpecies.objects.filter(entry_query).order_by('name')
+        found_species = TaxonomySpecies.objects.filter(entry_query).order_by('name')
+
+        entry_query = get_query(query_string, ['name',])
+        found_families = TaxonomyFamily.objects.filter(entry_query).order_by('name')
+        found_orders = TaxonomyOrder.objects.filter(entry_query).order_by('name')
+        found_classes = TaxonomyClass.objects.filter(entry_query).order_by('name')
+        
+        all_entries = list(chain(found_classes, found_orders, found_families, found_species))
 
     paginator = Paginator(all_entries, 10)
     page = request.GET.get('page')

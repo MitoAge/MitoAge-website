@@ -1,5 +1,7 @@
 from django.core import urlresolvers
+from django.core.urlresolvers import reverse
 from django.db import models, transaction
+
 
 class ClickableTaxonomyModel(models.Model):
     class Meta: 
@@ -24,6 +26,12 @@ class TaxonomyClass(ClickableTaxonomyModel):
     
     def number_of_species(self):
         return TaxonomySpecies.objects.filter(taxonomy_family__taxonomy_order__taxonomy_class=self).count()
+
+    def get_viewing_url(self):
+        return reverse('browse_class', args=(self.pk,))
+
+    def search_display(self):
+        return "Class: %s" % self.name
 
 
 class TaxonomyOrder(ClickableTaxonomyModel):
@@ -64,6 +72,12 @@ class TaxonomyOrder(ClickableTaxonomyModel):
                 self.taxonomy_class = temp
         super(TaxonomyOrder, self).save(*args, **kwargs)
 
+    def get_viewing_url(self):
+        return reverse('browse_order', args=(self.pk,))
+
+    def search_display(self):
+        return "Order: %s" % self.name
+
 
 class TaxonomyFamily(ClickableTaxonomyModel):
     class Meta:
@@ -102,6 +116,11 @@ class TaxonomyFamily(ClickableTaxonomyModel):
                 self.taxonomy_order = temp
         super(TaxonomyFamily, self).save(*args, **kwargs)
 
+    def get_viewing_url(self):
+        return reverse('browse_family', args=(self.pk,))
+
+    def search_display(self):
+        return "Family: %s" % self.name
 
 class TaxonomySpecies(models.Model):
     
@@ -279,3 +298,9 @@ class TaxonomySpecies(models.Model):
         if self.taxonomy_family is None or another_species.taxonomy_family is None:
             return False
         return self.taxonomy_family.is_same(another_species.taxonomy_family)
+
+    def get_viewing_url(self):
+        return reverse('view_species', args=(self.pk,))
+
+    def search_display(self):
+        return "%s%s" % (self.name,  (" (%s)" % self.common_name) if self.common_name else "")

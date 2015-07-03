@@ -12,10 +12,10 @@
 
 		<div class="row">
 			{% if all_entries %}
-				{% for species in all_entries %}
+				{% for object in all_entries %}
 					<div class="col-md-6">
 					<li>
-						<a href="{% url 'view_species' species.pk %}">{{ species.name }}{% if species.common_name %} ({{species.common_name}}){% endif %}</a>
+						{{object.prefix}}<a href="{{object.get_viewing_url}}">{{ object.search_display }}</a>
 					</li>
 					</div>
 				{% endfor %}

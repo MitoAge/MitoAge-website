@@ -28,18 +28,24 @@
 		</div>
 
 		{% block description_and_pagination %}
-		<div class="row">		
+		<div class="row">
+			
+			{% if is_paginated %}
 			<div class="col-md-7">
+			{% else %}
+			<div class="col-md-12">
+			{% endif %}
 				<ul class="pagination">
 				{% block content_description %} {% endblock %}
 				</ul>
 			</div>
 			
+			{% if is_paginated %}
 			<div class="col-md-5 top-buffer">
-				{% if is_paginated %}
-					{% bootstrap_paginate page_obj range=5 show_prev_next="true" show_first_last="true" previous_label="Previous" next_label="Next" first_label="First" last_label="Last"%}
-				{% endif %}
+				{% bootstrap_paginate page_obj range=5 show_prev_next="true" show_first_last="true" previous_label="Previous" next_label="Next" first_label="First" last_label="Last"%}
 			</div>
+			{% endif %}
+			
 		</div>
 		{% endblock %}
 

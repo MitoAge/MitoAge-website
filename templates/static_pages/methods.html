@@ -31,10 +31,10 @@
 		<li>Full taxonomy data is taken from the <a href="http://www.itis.gov/">ITIS database</a>.</li>
 		<li>The mtDNA sequence is taken from the Heavy strand.</li> 
 		<li>D-loop is taken from the Heavy strand when it is labeled as D-loop in NCBI.</li>
-		<li>For computing base composition, for each gene (protein-/rRNA-/tRNA-coding gene), we use the coding strand (according to <a href="http://www.ncbi.nlm.nih.gov/genbank/">NCBI GenBank</a>,  
-		if the gene position says "Complement" it is on the light strand; else, it is on the heavy strand). 
+		<li>For computing base composition, for each gene (protein-/rRNA-/tRNA-coding gene), we use the heavy strand (according to 
+		<a href="http://www.ncbi.nlm.nih.gov/genbank/">NCBI GenBank</a>, if the gene position says "Complement", it is on the light strand; else, it is on the heavy strand). 
 		<li>For computing codon usage, data is taken from the complement of the coding strand and T is replaced with U (i.e. the mRNA sequence).</li>
-		<li>When combining multiple genes (e.g. when computing the total protein coding region), we append one gene to another. In case of overlap, 
+		<li>When combining multiple genes (e.g. when computing the total protein-coding genes), we append one gene to another. In case of overlap, 
 		we count overlapping sequence only once for the computation of base composition, and we count them twice for the computation of codon usage.</li>
 		<li>Sequence are always analyzed from 5' to 3' (both for DNA and RNA).</li>
 	</ol>

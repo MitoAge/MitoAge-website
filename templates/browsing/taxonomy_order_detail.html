@@ -7,13 +7,14 @@
 {% block page_title %}Browsing order <i>{{ taxonomy_order.name }}</i> {% endblock%}
 
 {% block content_description %} 
-	<p>Order <b>{{ taxonomy_order.name }}</b> contains {{paginator.count}} taxonomic families spanning {{taxonomy_order.number_of_species}} species.
-	You can either use the <br/>links below to browse through the families, or you may <a class="btn btn-xs btn-primary" href="{% url 'stats' taxonomy_order.pk 'order' %}">view stats for the entire order</a> 
+	<p>Order <b>{{ taxonomy_order.name }}</b> contains {{paginator.count}} families spanning {{taxonomy_order.number_of_species}} species (in the brackets are the number of species in the family).
+	You can either use the links below to browse through the families, or you may <a class="btn btn-xs btn-primary" href="{% url 'stats' taxonomy_order.pk 'order' %}">view stats for the entire order</a> 
 	</p>
 {% endblock %}
 
 {% block browsing_content %}
 
+	<b>Families:</b>
 	<div class="row">
 		{% for taxonomy_family in object_list %}
 			<div class="col-md-4">

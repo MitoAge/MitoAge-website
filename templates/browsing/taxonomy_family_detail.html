@@ -8,7 +8,7 @@
 
 {% block content_description %} 
 	<p>Family <b>{{ taxonomy_family.name }}</b> contains {{paginator.count}} species.
-	You can either use the links below to browse through the <br/>species, or you may <a class="btn btn-xs btn-primary" href="{% url 'stats' taxonomy_family.pk 'family' %}">view stats for the entire family</a>
+	You can either use the links below to browse through the species, or you may <a class="btn btn-xs btn-primary" href="{% url 'stats' taxonomy_family.pk 'family' %}">view stats for the entire family</a>
 	</p>
 {% endblock %}
 
