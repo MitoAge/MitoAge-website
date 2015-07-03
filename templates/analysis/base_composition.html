@@ -6,10 +6,11 @@
 	<b>{{section|base_composition_nice_title}}:</b> 
 	No data available for this section.
 {% else %} 
+{% with size=base_composition.size %}
 <table class="table">
 	<thead>
 		<tr>
-			<th width="350px">{{section|base_composition_nice_title}} (size: {{base_composition.size}} bases)</th>
+			<th width="330px">{{section|base_composition_nice_title}} (size: {{size}} bases)</th>
 			<th class="text-center">GC</th>
 			<th class="text-center">AT</th>
 			<th class="text-center">G</th>
@@ -20,7 +21,7 @@
 	</thead>
 	<tbody>
 		<tr>
-			<td>Base composition</td>
+			<td>Base content (bases)</td>
 			<td class="text-center">{{base_composition.gc}}</td>
 			<td class="text-center">{{base_composition.at}}</td>
 			<td class="text-center">{{base_composition.g}}</td>
@@ -29,20 +30,21 @@
 			<td class="text-center">{{base_composition.t}}</td>
 		</tr>
 		<tr>
-			<td>Composition per 1kb</td>
-			<td class="text-center">{{base_composition.gc_1kb| stringformat:'d'}}</td>
-			<td class="text-center">{{base_composition.at_1kb| stringformat:'d'}}</td>
-			<td class="text-center">{{base_composition.g_1kb| stringformat:'d'}}</td>
-			<td class="text-center">{{base_composition.c_1kb| stringformat:'d'}}</td>
-			<td class="text-center">{{base_composition.a_1kb| stringformat:'d'}}</td>
-			<td class="text-center">{{base_composition.t_1kb| stringformat:'d'}}</td>
+			<td>Base content per 1 kb (bases)</td>
+			<td class="text-center">{{base_composition.gc|per_1kb:size }}</td>
+			<td class="text-center">{{base_composition.at|per_1kb:size }}</td>
+			<td class="text-center">{{base_composition.g|per_1kb:size}}</td>
+			<td class="text-center">{{base_composition.c|per_1kb:size}}</td>
+			<td class="text-center">{{base_composition.a|per_1kb:size}}</td>
+			<td class="text-center">{{base_composition.t|per_1kb:size}}</td>
 		</tr>
 		<tr>
-			<td>Fraction of mtDNA</td>
-			<td class="text-center">{{base_composition.gc_percent| stringformat:'.1f'}}%</td>
-			<td class="text-center">{{base_composition.at_percent| stringformat:'.1f'}}%</td>
+			<td>Complementary pairs (%)</td>
+			<td class="text-center">{% percent base_composition.gc size 1 %}%</td>
+			<td class="text-center">{% percent base_composition.at size 1 %}%</td>
 			<td colspan="4"> </td>
 		</tr>
 	</tbody>
 </table>
+{% endwith %}
 {% endif %}

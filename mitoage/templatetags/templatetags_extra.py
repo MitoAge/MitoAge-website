@@ -9,6 +9,23 @@ register = template.Library()
 def field_in_dictionary(row, key):
     return row.get(key, '')
 
+
+@register.filter
+def per_1kb(value, size):
+    return int(round(value*1000.0/size, 0)) if value and size else None
+
+@register.simple_tag
+def percent(value, size, digits):
+    return round(value*100.0/size, digits) if value and size else None
+
+
+@register.filter
+def total_lower(value):
+    new_value = value
+    if value.startswith("T"):
+        new_value = "t%s" % value[1:]
+    return new_value
+
 @register.filter
 def base_composition_nice_title(key):
     return BaseComposition.get_nice_title(key)
@@ -16,6 +33,7 @@ def base_composition_nice_title(key):
 @register.filter
 def codon_usage_nice_title(key):
     return CodonUsage.get_nice_title(key)
+
 
 @register.filter
 def pluralize_taxonomy(key):

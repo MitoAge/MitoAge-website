@@ -12,30 +12,30 @@
 		Most of the data included in the MitoAge database is computed offline, using a series of automated scripts.  
 		For a given set of refseq sequences, these scripts generate pre-computed compositional features for the total mitochondrial genome, 
 		as well as, for the different coding and non-coding mitochondrial regions. The generated CSV outputs are then checked for errors, 
-		potential inconsistencies with the database and/or other issues. This is done in a first instance using validation 
+		potential inconsistencies with the NCBI RefSeq database and/or other issues. This is done in a first instance using validation 
 		scripts, and if flags are raised, then the data is analyzed manually. If inconsistencies in the original data are found, they are 
 		fixed and reported to the authors of the relevant database (NCBI, ITIS, AnAge, etc). Upon a successful validation, the data is uploaded 
-		into the database and other statistical metrics are computed. 
+		into the MitoAge database and other statistical metrics are computed. 
 	</p>
 	<p>	
 		<b>Data is analyzed as follows:</b>
 		<li>For each protein-coding gene and for the total protein-coding region, both base composition and codon usage are computed.</li>
-		<li>For total mtDNA, the D-loop region, total tRNA-coding region, total rRNA-coding region, and for each of the rRNA genes only base compostion is analyzed.</li>
+		<li>For total mtDNA, the D-loop region, total tRNA-coding regions, total rRNA-coding regions, and for each of the rRNA genes only base compostion is analyzed.</li>
 	</p>
 
 	<br/>
 	<h4>How is the data calculated?</h4>
 	<ol>
-		<li>The sequences for all the species in the database are taken from the <a href="http://www.ncbi.nlm.nih.gov/refseq/">Refseq database at NCBI</a>.</li>
+		<li>The sequences for all the species in the database are taken from the <a href="http://www.ncbi.nlm.nih.gov/refseq/">RefSeq database at NCBI</a>.</li>
 		<li>The maximum lifespan records are taken from the <a href="http://genomics.senescence.info/species/">AnAge database</a>.</li>
 		<li>Full taxonomy data is taken from the <a href="http://www.itis.gov/">ITIS database</a>.</li>
-		<li>The mtDNA and D-Loop are taken from the Heavy strand that are labeled as D-Loops in NCBI.</li>
-		<li>For computing base composition, for each gene (protein-/rRNA-/tRNA-coding gene) we use the coding strand (according to <a href="http://www.ncbi.nlm.nih.gov/genbank/">NCBI GenBank</a> - 
-		if the gene position says "Complement" it is on the light strand, else - it is on the heavy strand). 
-		<li>For computing codon usage data is taken from the complement of the coding strand and T is replaced with U (i.e. the mRNA sequence).</li>
+		<li>The mtDNA sequence is taken from the Heavy strand.</li> 
+		<li>D-loop is taken from the Heavy strand when it is labeled as D-loop in NCBI.</li>
+		<li>For computing base composition, for each gene (protein-/rRNA-/tRNA-coding gene), we use the coding strand (according to <a href="http://www.ncbi.nlm.nih.gov/genbank/">NCBI GenBank</a>,  
+		if the gene position says "Complement" it is on the light strand; else, it is on the heavy strand). 
+		<li>For computing codon usage, data is taken from the complement of the coding strand and T is replaced with U (i.e. the mRNA sequence).</li>
 		<li>When combining multiple genes (e.g. when computing the total protein coding region), we append one gene to another. In case of overlap, 
-		we count overlapping sequence only once for the computation of base composition, and we count them twice for the computation of codon usage .</li>
-		<li>Non-coding sequences are considered all the sequences, from both strands combined, that do not encode for any rRNA/tRNA/protein coding region.</li>
+		we count overlapping sequence only once for the computation of base composition, and we count them twice for the computation of codon usage.</li>
 		<li>Sequence are always analyzed from 5' to 3' (both for DNA and RNA).</li>
 	</ol>
 {% endblock %}

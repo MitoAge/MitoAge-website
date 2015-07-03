@@ -1,7 +1,8 @@
 .form-group.search input{
 	padding-right: 30px;
 	padding-left: 6px;
-	width: 200px;
+	margin-left: 10px;
+	width: 250px;
 }
 
 .form-group.search:after{
@@ -36,6 +37,12 @@
 	width: 100px;
 }
 
+.mitoage-logo {
+	width: 120px;
+	margin-top: 5px;
+}
+
+
 .borderless1 table {
     margin-bottom: 0px !important; 
 }
@@ -54,7 +61,7 @@
   background: url(http://www.nlm.nih.gov/share/image/pubmed.gif) no-repeat;
 }
 
-.green_flame > a:link, .green_flame > li > a:visited {
+.green_flame > li > a:link, .green_flame > li > a:visited {
     color: #0f9d58;
 }
 

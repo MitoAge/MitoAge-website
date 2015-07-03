@@ -1,20 +1,9 @@
-from decimal import Decimal
-import math
-
 from django.db import models
-from django.db.models.aggregates import Avg, Max, Min, StdDev, Variance
+from django.db.models.aggregates import Avg, Max, Min, StdDev
+from django.db import connection
 
 from mitoage.taxonomy.models import TaxonomySpecies
-
-
-def median(lst):
-    lst = sorted(lst)
-    if len(lst) < 1:
-        return None
-    if len(lst) %2 == 1:
-        return lst[((len(lst)+1)/2)-1]
-    else:
-        return float(sum(lst[(len(lst)/2)-1:(len(lst)/2)+1]))/2.0
+import time
 
 def median_value(queryset,term):
     count = queryset.count()
@@ -22,24 +11,11 @@ def median_value(queryset,term):
         return "-"
     return queryset.values_list(term, flat=True).order_by(term)[int(round(count/2))]
 
-def average(lst):
-    return float(sum(lst))/len(lst)
-
-def stdev(lst):
-    avg = average(lst)
-    variance = map(lambda x: (float(x) - avg)**2, lst)
-    return math.sqrt(average(variance))
-
 class BaseCompositionStats():
     def __init__(self, species, section):
         self.section = section
-
-        import time
         start = time.time()
-        
-        #self.compute_stats(species, section)            TO BE DELETED SOONISH
         self.compute_stats2(species, section)
-
         end = time.time()
         self.elapsed_time = end - start        
 
@@ -50,12 +26,7 @@ class BaseCompositionStats():
                                'nd4':'nd4', 'nd4l':'nd4l', 'nd5':'nd5', 'nd6':'nd6', 'rRNA_12S':'rRNA_12S', 'rRNA_16S':'rRNA_16S'}.get(section, 'total_mtDNA')
         section_prefix = "bc_%s_" % section_translation
 
-        self.min = {} 
-        self.max = {} 
-        self.mean = {} 
-        self.stdev = {} 
-        self.median = {} 
-        self.coef_var = {} 
+        self.min, self.max, self.mean, self.stdev, self.median, self.coef_var = ({}, {}, {}, {}, {}, {})
 
         kwargs1 = { ('%ssize__isnull' % section_prefix): 'True', }
         kwargs2 = { ('%ssize__exact' % section_prefix): '0', }
@@ -68,7 +39,6 @@ class BaseCompositionStats():
         self.compute_stats_for("t", section_prefix, mitoage_entries) 
         self.compute_stats_for("lifespan", "species__", mitoage_entries)
         
-        from django.db import connection
         cursor = connection.cursor()
         fake_query = str(mitoage_entries.annotate(x=Min("%sg" % section_prefix)).query)
         from_query = fake_query[fake_query.find('FROM'):fake_query.find('GROUP BY')]
@@ -78,12 +48,7 @@ class BaseCompositionStats():
         
         self.additional_column = '(("analysis_mitoageentry"."%sa" + "analysis_mitoageentry"."%st")*100.0/"analysis_mitoageentry"."%ssize")' % (section_prefix, section_prefix, section_prefix)
         self.compute_stats_through_direct_queries(cursor, "at", from_query, self.additional_column)
-        
-        #mitoage_entries = MitoAgeEntry.objects.filter(species__pk__in=species).extra( select = {'gc': self.additional_column} )
-        #self.results = mitoage_entries.values('gc').aggregate(gc=Avg("gc"))
-        #self.results = MitoAgeEntry.objects.raw('SELECT avg(%s) FROM analysis_mitoageentry WHERE "analysis_mitoageentry"."species_id" IN (SELECT "taxonomy_taxonomyspecies"."id" FROM "taxonomy_taxonomyspecies")' % self.additional_column)
-        #self.query = mitoage_entries.annotate(gc=Min(self.additional_column)).query
-        #self.updated_entries = mitoage_entries.annotate(gc = (F("%s_g" % section_prefix) + F("%s_c" % section_prefix)) )
+
 
 
     def compute_stats_through_direct_queries(self, cursor, field_name, from_query, column):
@@ -111,59 +76,22 @@ class BaseCompositionStats():
 
     def compute_coef_of_variance(self, field_name):    
         if self.stdev[field_name]:
-            self.coef_var[field_name] = self.stdev[field_name]*self.stdev[field_name] / self.mean[field_name]
+            self.coef_var[field_name] = self.stdev[field_name] / self.mean[field_name]
         else:
             self.coef_var[field_name] = None
 
     
     def compute_stats_for(self, field_name, section_prefix, entries):
         full_field_name = section_prefix + field_name
-        results = entries.aggregate(average_value = Avg(full_field_name), stdev_value = StdDev(full_field_name), max_value = Max(full_field_name), min_value = Min(full_field_name), variance_value =Variance(full_field_name))
+        results = entries.aggregate(average_value = Avg(full_field_name), stdev_value = StdDev(full_field_name), max_value = Max(full_field_name), min_value = Min(full_field_name))
         self.min[field_name] = results['min_value']
         self.max[field_name] = results['max_value']
         self.mean[field_name] = results['average_value']
         self.stdev[field_name] = results['stdev_value']
         self.median[field_name] = median_value(entries,full_field_name)
         self.compute_coef_of_variance(field_name)
-        #self.coef_var[field_name] = results['variance_value']*1.0 / results['average_value']
-        #self.sum[field_name] = results['sum_value']
     
     
-    
-    
-    # - initial implementation, highly inneficient 
-    # - loads entries in memory and afterwards computes the statistics values - see compute_stats2 which uses aggregates
-    def compute_stats(self, species, section):
-        mitoage_entries = MitoAgeEntry.objects.filter(species__pk__in=species)
-
-        compositions = [entry.get_base_composition(section) for entry in mitoage_entries]
-        compositions = [x for x in compositions if (not x.is_empty()) and (x is not None)]
-        self.group_size = len(compositions) 
-        
-        # prep all the lists
-        self.g = [entry.g for entry in compositions]
-        self.c = [entry.c for entry in compositions]
-        self.a = [entry.a for entry in compositions]
-        self.t = [entry.t for entry in compositions]
-
-        self.g_1kb = [entry.g_1kb() for entry in compositions]
-        self.c_1kb = [entry.c_1kb() for entry in compositions]
-        self.a_1kb = [entry.a_1kb() for entry in compositions]
-        self.t_1kb = [entry.t_1kb() for entry in compositions]
-
-        self.gc = [entry.gc_percent() for entry in compositions]
-        self.at = [entry.at_percent() for entry in compositions]
-
-        self.lifespans = [entry.species.lifespan for entry in mitoage_entries] 
-
-        # compute simple stats for all the lists
-        self.min = { "g":min(self.g), "c":min(self.c), "a":min(self.a), "t":min(self.t), "g_1kb":min(self.g_1kb), "c_1kb":min(self.c_1kb), "a_1kb":min(self.a_1kb), "t_1kb":min(self.t_1kb), "gc":min(self.gc), "at":min(self.at), "lifespan":min(self.lifespans)} 
-        self.max = { "g":max(self.g), "c":max(self.c), "a":max(self.a), "t":max(self.t), "g_1kb":max(self.g_1kb), "c_1kb":max(self.c_1kb), "a_1kb":max(self.a_1kb), "t_1kb":max(self.t_1kb), "gc":max(self.gc), "at":max(self.at), "lifespan":max(self.lifespans)} 
-        self.mean = { "g":average(self.g), "c":average(self.c), "a":average(self.a), "t":average(self.t), "g_1kb":average(self.g_1kb), "c_1kb":average(self.c_1kb), "a_1kb":average(self.a_1kb), "t_1kb":average(self.t_1kb), "gc":average(self.gc), "at":average(self.at), "lifespan":average(self.lifespans)} 
-        self.stdev = { "g":stdev(self.g), "c":stdev(self.c), "a":stdev(self.a), "t":stdev(self.t), "g_1kb":stdev(self.g_1kb), "c_1kb":stdev(self.c_1kb), "a_1kb":stdev(self.a_1kb), "t_1kb":stdev(self.t_1kb), "gc":stdev(self.gc), "at":stdev(self.at), "lifespan":stdev(self.lifespans)} 
-        self.median = { "g":int(median(self.g)), "c":int(median(self.c)), "a":int(median(self.a)), "t":int(median(self.t)), "g_1kb":int(median(self.g_1kb)), "c_1kb":int(median(self.c_1kb)), "a_1kb":int(median(self.a_1kb)), "t_1kb":int(median(self.t_1kb)), "gc":median(self.gc), "at":median(self.at), "lifespan":median(self.lifespans)} 
-        
-         
     def to_string(self):
         return "n:%s, min:%s, max:%s, mean:%s, stdev:%s, median:%s" % (self.group_size, self.min, self.max, self.mean, self.stdev, self.median)
         
@@ -182,30 +110,6 @@ class BaseComposition():
 
     def at(self):
         return self.a + self.t
-
-    def g_1kb(self):
-        return round(self.g*1000.0/self.size,0) if self.g and self.size else None
-
-    def c_1kb(self):
-        return round(self.c*1000.0/self.size,0) if self.c and self.size else None
-
-    def a_1kb(self):
-        return round(self.a*1000.0/self.size,0) if self.a and self.size else None
-
-    def t_1kb(self):
-        return round(self.t*1000.0/self.size,0) if self.t and self.size else None
-
-    def gc_percent(self):
-        return round((self.g+self.c)*100.0/self.size,1) if self.g and self.c and self.size else None
-
-    def at_percent(self):
-        return round((self.a+self.t)*100.0/self.size,1) if self.a and self.t and self.size else None
-
-    def gc_1kb(self):
-        return round((self.g+self.c)*1000.0/self.size,0) if self.g and self.c and self.size else None
-
-    def at_1kb(self):
-        return round((self.a+self.t)*1000.0/self.size,0) if self.a and self.t and self.size else None
 
     def is_same(self, other):
         return self.size==other.size and self.g==other.g and self.c==other.c and self.a==other.a and self.t==other.t and self.others==other.others 
@@ -230,25 +134,25 @@ class BaseComposition():
     def get_nice_title(key):
         return {
             'total_mtDNA': "Total mtDNA",
-            'total_pc_mtDNA': "Total protein-coding region",
-            'd_loop_mtDNA': "D-loop region",
-            'total_tRNA_mtDNA': "Total tRNA-coding region",
-            'total_rRNA_mtDNA': "Total rRNA-coding region",
-            'atp6': "Gene ATP6",
-            'atp8': "Gene ATP8",
-            'cox1': "Gene COX1",
-            'cox2': "Gene COX2",
-            'cox3': "Gene COX3",
-            'cytb': "Gene CYTB",
-            'nd1': "Gene ND1",
-            'nd2': "Gene ND2",
-            'nd3': "Gene ND3",
-            'nd4': "Gene ND4",
-            'nd4l': "Gene ND4L",
-            'nd5': "Gene ND5",
-            'nd6': "Gene ND6",
-            'rRNA_12S': "12S ribosomal unit of mtDNA",
-            'rRNA_16S': "16S ribosomal unit of mtDNA",
+            'total_pc_mtDNA': "Total protein-coding genes",
+            'd_loop_mtDNA': "D-loop",
+            'total_tRNA_mtDNA': "Total tRNA-coding genes",
+            'total_rRNA_mtDNA': "Total rRNA-coding genes",
+            'atp6': "ATP6",
+            'atp8': "ATP8",
+            'cox1': "COX1",
+            'cox2': "COX2",
+            'cox3': "COX3",
+            'cytb': "CYTB",
+            'nd1': "ND1",
+            'nd2': "ND2",
+            'nd3': "ND3",
+            'nd4': "ND4",
+            'nd4l': "ND4L",
+            'nd5': "ND5",
+            'nd6': "ND6",
+            'rRNA_12S': "12S rRNA gene",
+            'rRNA_16S': "16S rRNA gene",
         }.get(key, "No title")
 
 
@@ -261,20 +165,20 @@ class CodonUsage(models.Model):
     @staticmethod
     def get_nice_title(key):
         return {
-            'total_pc_mtDNA': "Total protein-coding region",
-            'atp6': "Gene ATP6",
-            'atp8': "Gene ATP8",
-            'cox1': "Gene COX1",
-            'cox2': "Gene COX2",
-            'cox3': "Gene COX3",
-            'cytb': "Gene CYTB",
-            'nd1': "Gene ND1",
-            'nd2': "Gene ND2",
-            'nd3': "Gene ND3",
-            'nd4': "Gene ND4",
-            'nd4l': "Gene ND4L",
-            'nd5': "Gene ND5",
-            'nd6': "Gene ND6",
+            'total_pc_mtDNA': "Total protein-coding genes",
+            'atp6': "ATP6",
+            'atp8': "ATP8",
+            'cox1': "COX1",
+            'cox2': "COX2",
+            'cox3': "COX3",
+            'cytb': "CYTB",
+            'nd1': "ND1",
+            'nd2': "ND2",
+            'nd3': "ND3",
+            'nd4': "ND4",
+            'nd4l': "ND4L",
+            'nd5': "ND5",
+            'nd6': "ND6",
         }.get(key, "No title")
 
     cu_protein_coding_entry = models.OneToOneField("MitoAgeEntry", related_name = "protein_coding_codon_usage", blank=True, null = True)

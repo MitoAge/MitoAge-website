@@ -12,7 +12,7 @@
 <table class="table">
 	<thead>
 		<tr>
-			<th colspan="8" class="text-center">Stats for {{stats.section|base_composition_nice_title}} (group size: {{stats.group_size}} species)</th>
+			<th colspan="8" class="text-center">Stats for {{stats.section|base_composition_nice_title|total_lower}} (group size: {{stats.group_size}} species)</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -28,8 +28,8 @@
 		</tr>
 		<tr>
 			<td>Range (min-max)</td>
-			<td class="text-center">{% if stats.min.gc %}{{stats.min.gc| stringformat:'.1f'}}% - {{stats.max.gc| stringformat:'.1f'}}%{% endif %}</td>
-			<td class="text-center">{% if stats.min.at %}{{stats.min.at| stringformat:'.1f'}}% - {{stats.max.at| stringformat:'.1f'}}%{% endif %}</td>
+			<td class="text-center">{% if stats.min.gc %}{{stats.min.gc| stringformat:'.1f'}} - {{stats.max.gc| stringformat:'.1f'}}%{% endif %}</td>
+			<td class="text-center">{% if stats.min.at %}{{stats.min.at| stringformat:'.1f'}} - {{stats.max.at| stringformat:'.1f'}}%{% endif %}</td>
 			<td class="text-center">{% if stats.min.g %}{{stats.min.g| stringformat:'d'}} - {{stats.max.g| stringformat:'d'}}{% endif %}</td>
 			<td class="text-center">{% if stats.min.c %}{{stats.min.c| stringformat:'d'}} - {{stats.max.c| stringformat:'d'}}{% endif %}</td>
 			<td class="text-center">{% if stats.min.a %}{{stats.min.a| stringformat:'d'}} - {{stats.max.a| stringformat:'d'}}{% endif %}</td>
@@ -48,8 +48,8 @@
 		</tr>
 		<tr>
 			<td>Average &plusmn; stdev</td>
-			<td class="text-center">{% if stats.mean.gc %}{{stats.mean.gc| stringformat:'.1f'}}% &plusmn; {{stats.stdev.gc| stringformat:'.1f'}}%{% endif %}</td>
-			<td class="text-center">{% if stats.mean.at %}{{stats.mean.at| stringformat:'.1f'}}% &plusmn; {{stats.stdev.at| stringformat:'.1f'}}%{% endif %}</td>
+			<td class="text-center">{% if stats.mean.gc %}{{stats.mean.gc| stringformat:'.1f'}} &plusmn; {{stats.stdev.gc| stringformat:'.1f'}}%{% endif %}</td>
+			<td class="text-center">{% if stats.mean.at %}{{stats.mean.at| stringformat:'.1f'}} &plusmn; {{stats.stdev.at| stringformat:'.1f'}}%{% endif %}</td>
 			<td class="text-center">{% if stats.mean.g %}{{stats.mean.g| stringformat:'d'}} &plusmn; {{stats.stdev.g| stringformat:'d'}}{% endif %}</td>
 			<td class="text-center">{% if stats.mean.c %}{{stats.mean.c| stringformat:'d'}} &plusmn; {{stats.stdev.c| stringformat:'d'}}{% endif %}</td>
 			<td class="text-center">{% if stats.mean.a %}{{stats.mean.a| stringformat:'d'}} &plusmn; {{stats.stdev.a| stringformat:'d'}}{% endif %}</td>
@@ -58,13 +58,13 @@
 		</tr>
 		<tr>
 			<td>Coefficient of variation</td>	
-			<td class="text-center">{% if stats.coef_var.gc %}{{stats.coef_var.gc| stringformat:'.1f'}}%{% endif %}</td>
-			<td class="text-center">{% if stats.coef_var.at %}{{stats.coef_var.at| stringformat:'.1f'}}%{% endif %}</td>
-			<td class="text-center">{% if stats.coef_var.g %}{{stats.coef_var.g| stringformat:'d'}}{% endif %}</td>
-			<td class="text-center">{% if stats.coef_var.c %}{{stats.coef_var.c| stringformat:'d'}}{% endif %}</td>
-			<td class="text-center">{% if stats.coef_var.a %}{{stats.coef_var.a| stringformat:'d'}}{% endif %}</td>
-			<td class="text-center">{% if stats.coef_var.t %}{{stats.coef_var.t| stringformat:'d'}}{% endif %}</td>
-			<td class="text-center">{% if stats.coef_var.lifespan %}{{stats.coef_var.lifespan| stringformat:'.1f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.coef_var.gc %}{{stats.coef_var.gc| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.coef_var.at %}{{stats.coef_var.at| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.coef_var.g %}{{stats.coef_var.g| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.coef_var.c %}{{stats.coef_var.c| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.coef_var.a %}{{stats.coef_var.a| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.coef_var.t %}{{stats.coef_var.t| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.coef_var.lifespan %}{{stats.coef_var.lifespan| stringformat:'.2f'}}{% endif %}</td>
 		</tr>
 	</tbody>
 </table>

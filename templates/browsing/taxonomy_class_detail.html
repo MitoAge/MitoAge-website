@@ -7,7 +7,7 @@
 {% block page_title %}Browsing class <i>{{ taxonomy_class.name }}</i> {% endblock%}
 
 {% block content_description %} 
-	<p>Class <b>{{ taxonomy_class.name }}</b> contains {{paginator.count}} taxonomic orders spanning {{taxonomy_class.number_of_species}} species.
+	<p>Class <b>{{ taxonomy_class.name }}</b> contains {{paginator.count}} orders spanning {{taxonomy_class.number_of_species}} species.
 	You can either use the links <br/> below to browse through the orders, or you may <a class="btn btn-xs btn-primary" href="{% url 'stats' taxonomy_class.pk 'class' %}">view stats for the entire class</a>
 {% endblock %}
 
