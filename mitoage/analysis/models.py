@@ -32,6 +32,10 @@ class BaseCompositionStats():
         kwargs2 = { ('%ssize__exact' % section_prefix): '0', }
         mitoage_entries = MitoAgeEntry.objects.filter(species__pk__in=species).exclude(**kwargs1).exclude(**kwargs2)
         self.group_size = mitoage_entries.count()
+        
+        if self.group_size <= 5:
+            self.compositions = [ (x.species, x.get_base_composition(section)) for x in mitoage_entries ]
+            return 
 
         self.compute_stats_for("g", section_prefix, mitoage_entries) 
         self.compute_stats_for("c", section_prefix, mitoage_entries) 
