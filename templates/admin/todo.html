@@ -6,53 +6,53 @@
 {% block content %}
 
 	<div class="alert alert-info" role="info">
-		<h4>ToDO list:</h4>
-		<br/>
-		<li> Create builds from Administration<br/> </li> 
-		<br/>
-		<li> Integrate DNA process algorithm in the admin <br/> </li> 
-		<br/>
-		<li> Statistics - aggregation <br/> </li> 
-		<br/>
-		<li> Consider making taxonomy more flexible - to include more fields (but keep in mind that flattening it comes with some disadvantages) <br/> </li> 
-		<br/>
-		<li> Consider making a spin-off project to predict maximum lifespan (check if a inter-lab grant can be obtained = main question why it would be useful?) <br/> </li> 
-		<br/>
+		<h4>ToDO now (soon-ish):</h4>
+		<br/><li> <b>Stats browser (pagination) needs to be done with jQuery as it now loads the entire page (annoying)</b><br/> </li> 
 		
-		<li> search in any taxa (now only in species) <br/> </li> 
-		<br/>
+		<br/><li> <b>Spearman (done directly with postgresql - otherwise will probably timeout)</b><br/> </li> 
 		
-		<li> implement more check tests in the admin (for example: bc full of 0s, or only 1 field in bc is None, warnings for missing fields)<br/> </li> 
-		<br/>
+		<br/><li> <b>compute AA frequencies from codon entry</b><br/> </li>
+		 
+		<br/><li> change both paginations to the vertical version and display browsing of all the species in the main panel (this requires two paginators 
+		on the same page - done before, but it will require some changes to the code) </li> 
+		
+		<br/><li> <b>To finish pagination in search! (more important now that we search taxa too)</b><br/> </li> 
+		
+		<br/><li> export any selection/taxa + intermediary screen maybe to view all data as in excel (can be done at least for base composition) <br/> </li> 
+		
+		<br/><li> <b>comparison table of values for a taxon (can be the same as the intermediary screen from exporting)</b> <br/> </li>
+		
+		<br/><li> <b>comparison between stats for 2 taxons </b> <br/> </li> 
+		
+		<br/><li> truncate AA seq + and allow expansion (with js/jQuery) <br/> </li> 
 
-		<li> stats could cache results <br/> </li> 
-		<br/>
+		<br/><li> Find a better way to display codon usage <br/> </li> 
+	</div>
+	
+	<br/>
+	
+	<div class="alert alert-info" role="info">
+		<h4>Medium-term ToDO list (maybe for NAR, but not essential):</h4>
+		
+		<br/><li> Create builds from Administration<br/> </li> 
+
+		<br/><li> "Shopping cart"-like behavior to pick a set of species for comparison<br/> </li> 
+
+		<br/><li> <b>(maybe important!) </b>stats could be cached (maybe at least for large sets like "all species") <br/> </li> 
+
+		<br/><li> <b>(maybe important!) </b>implement more check tests in the admin (for example: bc full of 0s, or only 1 field in bc is None, warnings for missing fields, the checks that Mitya did in excel for data integrity -- think of more)<br/> </li> 
 	</div>
 
+	<br/>
+
 	<div class="alert alert-info" role="info">
-		<h4>ToDO now:</h4>
-		<br/>
-		<li> <b>Stats browser needs to be done with jQuery as it now loads the entire page (annoying)</b><br/> </li> 
-		<br/>
-		<li> <b>Spearman</b><br/> </li> 
-		<br/>
-		<li> <b>compute AA frequencies from codon entry</b><br/> </li> 
-		<br/>
-		<li> change both paginations to the vertical version and display browsing of all the species in the main panel (this requires two paginators 
-		on the same page - done before, but it will require some changes to the code) </li> 
-		<br/>
-		<li> <b>To finish pagination in search! (more important now that we search taxa too)</b><br/> </li> 
-		<br/>
-		<li> export any selection/taxa + intermediary screen to compare data as in excel <br/> </li> 
-		<br/>
-		<li> <b>comparison table of values for a taxon </b> <br/> </li> 
-		<br/>
-		<li> <b>comparison between stats for 2 taxons </b> <br/> </li> 
-		<br/>
-		<li> truncate AA seq + and allow expansion <br/> </li> 
-		<br/>
-		<li> put limit for number of species in stats - actually display differently if <5 species <br/> </li> 
-		<br/>
+		<h4>Long-term ToDO list (probably not for the NAR paper):</h4>
+
+		<br/><li> Integrate DNA processing algorithm (Thomer's code) in the admin (will require some scheduling mechanism as to overcome Heroku's timeout)<br/> </li> 
+
+		<br/><li> Consider making taxonomy more flexible - for example to easily include later more fields like Phylum or Kingdom (but keep in mind that flattening it comes with some disadvantages - more comments on this are in the code) <br/> </li> 
+
+		<br/><li> Consider making a spin-off project to predict maximum lifespan (check if a inter-lab grant can be obtained = main question why it would be useful?) <br/> </li> 
 	</div>
 
 {% endblock %}
