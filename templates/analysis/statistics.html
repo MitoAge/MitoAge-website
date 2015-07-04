@@ -9,27 +9,61 @@
 	<h3>MitoAge Build 1.0</h3>
 	
 	<br/>
-	
-	<dl class="dl-horizontal">
-		<dt>Release date:</dt>
-		<dd>July 1st, 2015</dd>
-	</dl>
-	<dl class="dl-horizontal">
-		<dt>Number of species:</dt>
-		<dd>{{nr_of_species}} (species with fully sequenced mtDNA and maximum lifespan records)</dd>
-	</dl>
-	<dl class="dl-horizontal">
-		<dt>Number of families:</dt>
-		<dd>{{nr_of_families}}</dd>
-	</dl>
-	<dl class="dl-horizontal">
-		<dt>Number of orders:</dt>
-		<dd>{{nr_of_orders}}</dd>
-	</dl>
-	<dl class="dl-horizontal">
-		<dt>Number of classes:</dt>
-		<dd>{{nr_of_classes}}</dd>
-	</dl>
+	<div class="row">
+		<div class="col-md-5">
+			<dl class="dl-horizontal">
+				<dt>Release date:</dt>
+				<dd>July 1st, 2015</dd>
+			</dl>
+			<dl class="dl-horizontal">
+				<dt>Number of species:</dt>
+				<dd>{{no_of_species}} (species with fully sequenced mtDNA and maximum lifespan records)</dd>
+			</dl>
+			<dl class="dl-horizontal">
+				<dt>Number of families:</dt>
+				<dd>{{no_of_families}}</dd>
+			</dl>
+			<dl class="dl-horizontal">
+				<dt>Number of orders:</dt>
+				<dd>{{no_of_orders}}</dd>
+			</dl>
+			<dl class="dl-horizontal">
+				<dt>Number of classes:</dt>
+				<dd>{{no_of_classes}}</dd>
+			</dl>
+		</div>
+		<div class="col-md-7">
+			<dl class="dl-horizontal">
+				<dt>Maximum lifespan:<br/></dt>
+				<dd>{{ species_min_ls.lifespan| stringformat:'.2f' }} years (<a href="{{species_min_ls.get_viewing_url}}">{{species_min_ls.name}}</a>) - 
+					{{ species_max_ls.lifespan| stringformat:'d' }} years (<a href="{{species_max_ls.get_viewing_url}}">{{species_max_ls.name}}</a>)</dd>
+			</dl>
+			<dl class="dl-horizontal">
+				<dt>Longest mtDNA:</dt>
+				<dd>{{ entry_max_size.bc_total_mtDNA_size }} bases (<a href="{{entry_max_size.species.get_viewing_url}}">{{entry_max_size.species.name}}</a>)</dd>
+			</dl>
+			<dl class="dl-horizontal">
+				<dt>Shortest mtDNA:<br/><br/></dt>
+				<dd>{{ entry_min_size.bc_total_mtDNA_size }} bases (<a href="{{entry_min_size.species.get_viewing_url}}">{{entry_min_size.species.name}}</a>)</dd>
+			</dl>
+			<dl class="dl-horizontal">
+				<dt>Max GC content (%):</dt>
+				<dd>{{ max_gc| stringformat:'.2f' }}% (<a href="{{max_gc_species.get_viewing_url}}">{{max_gc_species.name}}</a>)</dd>
+			</dl>
+			<dl class="dl-horizontal">
+				<dt>Min AT content (%):<br/><br/></dt>
+				<dd>{{ min_at| stringformat:'.2f' }}% (<a href="{{min_at_species.get_viewing_url}}">{{min_at_species.name}}</a>)</dd>
+			</dl>
+			<dl class="dl-horizontal">
+				<dt>Min GC content (%):</dt>
+				<dd>{{ min_gc| stringformat:'.2f' }}% (<a href="{{min_gc_species.get_viewing_url}}">{{min_gc_species.name}}</a>)</dd>
+			</dl>
+			<dl class="dl-horizontal">
+				<dt>Max AT content (%):</dt>
+				<dd>{{ max_at| stringformat:'.2f' }}% (<a href="{{max_at_species.get_viewing_url}}">{{max_at_species.name}}</a>)</dd>
+			</dl>
+		</div>
+	</div>
 
 	<hr>
 	<h4><u>Future plans</u></h4>

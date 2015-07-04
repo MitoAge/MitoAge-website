@@ -34,13 +34,13 @@
 			{% for c in stats.compositions %}
 			<tr>
 				<td>{{c.0.name}}</td>
-				<td class="text-center">{{c.1.gc}}</td>
-				<td class="text-center">{{c.1.at}}</td>
-				<td class="text-center">{{c.1.g}}</td>
-				<td class="text-center">{{c.1.c}}</td>
-				<td class="text-center">{{c.1.a}}</td>
-				<td class="text-center">{{c.1.t}}</td>
-				<td class="text-center">{{c.0.lifespan}}</td>
+				<td class="text-center">{% percent c.1.gc c.1.size 1 %}</td>
+				<td class="text-center">{% percent c.1.at c.1.size 1 %}</td>
+				<td class="text-center">{{c.1.g| stringformat:'d'}}</td>
+				<td class="text-center">{{c.1.c| stringformat:'d'}}</td>
+				<td class="text-center">{{c.1.a| stringformat:'d'}}</td>
+				<td class="text-center">{{c.1.t| stringformat:'d'}}</td>
+				<td class="text-center">{{c.0.lifespan| stringformat:'.1f'}}</td>
 			</tr>
 			{% endfor %}
 		{% else %}
