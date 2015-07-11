@@ -1,9 +1,14 @@
+import collections
+import time
+
+from django.db import connection
 from django.db import models
 from django.db.models.aggregates import Avg, Max, Min, StdDev
-from django.db import connection
+import simplejson
 
-from mitoage.taxonomy.models import TaxonomySpecies
-import time
+from mitoage.taxonomy.models import TaxonomySpecies, TaxonomyClass, \
+    TaxonomyOrder, TaxonomyFamily
+
 
 def median_value(queryset,term):
     count = queryset.count()
@@ -11,13 +16,79 @@ def median_value(queryset,term):
         return "-"
     return queryset.values_list(term, flat=True).order_by(term)[int(round(count/2))]
 
+ 
+class StatsCache(models.Model):
+    TAXON_TYPES = ( (1, 'All species'), (2, 'Class'), (3, 'Order'), (4, 'Family'), )
+    TAXON_DICT = {1:'All species', 2:'Class', 3:'Order', 4:'Family'}
+
+    class Meta:
+        unique_together = ('group_type', 'taxon_id', 'group_section')
+
+    # unique key
+    group_type = models.IntegerField("Type of group", max_length=1, choices = TAXON_TYPES, default=1)
+    taxon_id = models.IntegerField("Taxon ID", max_length=11)
+    group_section = models.CharField("Section of mtDNA", max_length=20)
+
+    # data
+    group_size = models.IntegerField("Size of group", max_length=5)
+    stats_dump = models.TextField("Cached stats")
+    
+    def dump_stats(self, group_type, taxon_id, section, stats):
+        (self.group_section, self.group_size, self.group_type, self.taxon_id) = (section, stats.group_size, group_type, taxon_id)
+        self.stats_dump = simplejson.dumps([stats.min, stats.max, stats.mean, stats.stdev, stats.median, stats.coef_var], use_decimal=True)
+
+    def get_group_name(self):
+        if self.group_type==1:
+            return "All species"
+        elif self.group_type==2:
+            try:
+                return TaxonomyClass.objects.get(id=self.taxon_id).name
+            except TaxonomyClass.DoesNotExist:
+                return "(Class not found)"
+        elif self.group_type==3:
+            try:
+                return TaxonomyOrder.objects.get(id=self.taxon_id).name
+            except TaxonomyOrder.DoesNotExist:
+                return "(Order not found)"
+        elif self.group_type==4:
+            try:
+                return TaxonomyFamily.objects.get(id=self.taxon_id).name
+            except TaxonomyFamily.DoesNotExist:
+                return "(Family not found)"
+        return "(Custom species set)"
+
+    def __unicode__(self):
+        return u'%s stats for %s%s' % (self.group_section, StatsCache.TAXON_DICT.get(self.group_type,"").lower(), (" %s" % self.get_group_name() if (self.group_type in [2,3,4]) else "") ) 
+
+
 class BaseCompositionStats():
-    def __init__(self, species, section):
+    def __init__(self, species, section, taxon_type="Custom", taxon_object=None):
         self.section = section
         start = time.time()
-        self.compute_stats2(species, section)
+        
+        if taxon_type!="Custom" and species.count()>5:
+            group_type = {"":1, "class":2, "order":3, "family":4}[taxon_type] if taxon_type else 1
+            taxon_id = taxon_object.pk if taxon_object else 0
+            try:
+                cache = StatsCache.objects.get(group_type=group_type, taxon_id=taxon_id, group_section=section)
+                self.group_size = cache.group_size
+                self.min, self.max, self.mean, self.stdev, self.median, self.coef_var = simplejson.loads(cache.stats_dump) 
+                
+            except StatsCache.DoesNotExist:
+                # no cache found, computing and saving
+                self.compute_stats2(species, section)
+                cache = StatsCache()
+                cache.dump_stats(group_type, taxon_id, section, self)
+                cache.save()
+            except StatsCache.MultipleObjectsReturned:
+                # what to do if multiple caches have been returned?
+                pass
+        else:
+            self.compute_stats2(species, section)
+            
         end = time.time()
         self.elapsed_time = end - start        
+
 
     def compute_stats2(self, species, section):
         section_translation = {'total_mtDNA':'total_mtDNA', 'total_pc_mtDNA':'total_mtDNA_pc', 'd_loop_mtDNA':'d_loop', 
@@ -158,6 +229,32 @@ class BaseComposition():
             'rRNA_12S': "12S rRNA gene",
             'rRNA_16S': "16S rRNA gene",
         }.get(key, "No title")
+
+
+
+class AminoAcid():
+
+    def __init__(self, letter):
+        self.letter = letter
+        self.symbol = AminoAcid.get_aa_symbol(letter)
+        self.name = AminoAcid.get_aa_name(letter)
+    
+    @staticmethod
+    def get_aa_name(aa_letter):
+        return {"G":"Glycine", "A":"Alanine", "S":"Serine", "T":"Threonine", "C":"Cysteine", "V":"Valine", "L":"Leucine", "I":"Isoleucine", 
+                "M":"Methionine", "P":"Proline", "F":"Phenylalanine", "Y":"Tyrosine", "W":"Tryptophan", "D":"Aspartic acid", 
+                "E":"Glutamic acid", "N":"Asparagine", "Q":"Glutamine", "H":"Histidine", "K":"Lysine", "R":"Arginine"}.get(aa_letter, "N/A")
+
+    @staticmethod
+    def get_aa_symbol(aa_letter):
+        return {"G":"Gly", "A":"Ala", "S":"Ser", "T":"Thr", "C":"Cys", "V":"Val", "L":"Leu", "I":"Ile", "M":"Met", "P":"Pro", 
+                "F":"Phe", "Y":"Tyr", "W":"Trp", "D":"Asp", "E":"Glu", "N":"Asn", "Q":"Gln", "H":"His", "K":"Lys", "R":"Arg"}.get(aa_letter, "N/A")
+
+    @staticmethod
+    def get_amino_acids():
+        return [AminoAcid("G"), AminoAcid("A"), AminoAcid("S"), AminoAcid("T"), AminoAcid("C"), AminoAcid("V"), AminoAcid("L"), AminoAcid("I"), 
+                AminoAcid("M"), AminoAcid("P"), AminoAcid("F"), AminoAcid("Y"), AminoAcid("W"), AminoAcid("D"), AminoAcid("E"), AminoAcid("N"), 
+                AminoAcid("Q"), AminoAcid("H"), AminoAcid("K"), AminoAcid("R")]
 
 
 class CodonUsage(models.Model):
@@ -336,6 +433,12 @@ class CodonUsage(models.Model):
 
     def to_string(self):
         return "[AUU:%s;AUC:%s;AUA:%s;CUU:%s;CUC:%s ... ]" % (self.AUU, self.AUC, self.AUA, self.CUU, self.CUC)
+    
+    def get_amino_acids(self):
+        return AminoAcid.get_amino_acids()
+
+    def get_aa_frequencies(self):
+        return collections.Counter(self.aa)
 
     def is_empty(self):
         return self.AUU == None and self.AUC == None and  self.AUA == None and  self.CUU == None and self.CUC == None and self.CUA == None and self.CUG == None and self.UUA == None and self.CAA == None and self.CAG == None and self.GUU == None and self.GUC == None and self.GUA == None and self.GUG == None and self.UUU == None and self.UUC == None and self.AUG == None and self.UGU == None and self.UGC == None and self.GCU == None and self.GCC == None and self.GCA == None and self.GCG == None and self.GGU == None and self.GGC == None and self.GGA == None and self.GGG == None and self.CCU == None and self.CCC == None and self.CCA == None and self.CCG == None and self.ACU == None and self.ACC == None and self.ACA == None and self.ACG == None and self.UCU == None and self.UCC == None and self.UCA == None and self.UCG == None and self.AGU == None and self.AGC == None and self.UAU == None and self.UAC == None and self.UGG == None and self.UUG == None and self.AAU == None and self.AAC == None and self.CAU == None and self.CAC == None and self.GAA == None and self.GAG == None and self.GAU == None and self.GAC == None and self.AAA == None and self.AAG == None and self.CGU == None and self.CGC == None and self.CGA == None and self.CGG == None and self.AGA == None and self.AGG == None and self.UAA == None and self.UAG == None and self.UGA == None and self.aa==None and self.size==None

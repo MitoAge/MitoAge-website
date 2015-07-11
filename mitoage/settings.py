@@ -157,6 +157,9 @@ SUIT_CONFIG = {
             {'url': 'admin:bc_csvimport', 'label': 'Import base composition'},
             {'url': 'admin:cu_csvimport', 'label': 'Import codon usage'},
         )},
+        {'app': 'analysis', 'label': 'Cache', 'icon':'icon-star', 'models': (
+            'analysis.statscache',  
+        )},
         {'label': 'Future ToDOs', 'icon':'icon-list-alt', 'url': 'admin:todo_list'},
     ),
     # misc

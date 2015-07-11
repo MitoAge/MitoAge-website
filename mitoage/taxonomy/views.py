@@ -189,7 +189,7 @@ class StatsBrowsing(SingleObjectMixin, ListView):
         else:
             # we don't have a taxon and a pk because we want to work on all the species
             context['title'] = "Stats %sfor all MitoAge species" % "of %s " % self.gene.upper() if self.gene else ""
-            context['taxon'] = self.taxon
+            #context['taxon'] = self.taxon
             context['subtaxon'] = 'class'
         context['breadcrumbs'] = self.get_breadcrumbs()
         
@@ -197,9 +197,9 @@ class StatsBrowsing(SingleObjectMixin, ListView):
         species = self.get_species()
         context['gene'] = self.gene
         if self.gene:
-            context['stats'] = [ BaseCompositionStats(species, self.gene) ]
+            context['stats'] = [ BaseCompositionStats(species, self.gene, self.taxon, self.object) ]
         else:
-            context['stats'] = [ BaseCompositionStats(species, section) for section in BaseComposition.get_bc_sections() ]
+            context['stats'] = [ BaseCompositionStats(species, section, self.taxon, self.object) for section in BaseComposition.get_bc_sections() ]
         
         return context
 

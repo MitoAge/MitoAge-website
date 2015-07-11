@@ -15,7 +15,46 @@
 	
 	<tbody>
 		<tr>
-			<td colspan="16" style="word-break:break-all;"><b>Amino acid sequence:</b> {{codon_usage.aa|safe}}</td>
+			<td colspan="16" style="word-break:break-all;"><b>Amino acid sequence:</b> 
+				{% if codon_usage.aa|length > 90 %}
+					<script type="text/javascript">
+						var {{section}}_aa_seq;
+						var {{section}}_aa_seq_state = 1;
+	
+						function {{section}}_aa_seq_toggle() {
+						    {{section}}_aa_seq_state = !{{section}}_aa_seq_state;
+						    if ({{section}}_aa_seq_state)
+						    {
+						    	 {{section}}_aa_seq = "{{codon_usage.aa|safe}}";
+						    	 {{section}}_aa_seq_link_title = "View less";
+						    }else
+						    { 
+						    	 {{section}}_aa_seq = "{{codon_usage.aa|slice:":90"|safe}}";
+						    	 {{section}}_aa_seq_link_title = "View full";
+						    }
+							$('#{{section}}_aa_seq_div').html({{section}}_aa_seq + ' <a href="javascript:void(0)" onclick="{{section}}_aa_seq_toggle();">'+{{section}}_aa_seq_link_title+'</a>');
+						}
+						$('#{{section}}_aa_seq_div').ready ( function(){
+						   {{section}}_aa_seq_toggle();
+						});
+					</script>
+					<span id="{{section}}_aa_seq_div">
+					</span>
+				{% else %}
+					{{codon_usage.aa|safe}}
+				{% endif %}
+			</td>
+		</tr>
+		<tr>
+			<td colspan="16" style="word-break:break-all;"><b>Amino acid frequencies:</b> 
+				
+				{% with frequecies=codon_usage.get_aa_frequencies %}
+					{% for aa in codon_usage.get_amino_acids %}
+						{{ aa.name }} ({{ aa.symbol }}, {{ aa.letter}}) - 
+	    				{{ frequecies|field_in_dictionary:aa.letter }}
+	    			{% endfor %}
+				{% endwith %}
+			</td>
 		</tr>
 		<tr>
 			<td colspan="16"><b>Codon statistics:</b></td>

@@ -3,12 +3,48 @@ from django.contrib import admin
 from django.contrib.admin.options import ModelAdmin
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
-from django.views.generic.base import TemplateView
 
-from mitoage.analysis.models import MitoAgeEntry, BaseComposition, CodonUsage
-from mitoage.taxonomy.models import TaxonomySpecies
+from mitoage.analysis.models import MitoAgeEntry, BaseComposition, CodonUsage, \
+    StatsCache
+from mitoage.taxonomy.models import TaxonomySpecies, TaxonomyClass, \
+    TaxonomyOrder, TaxonomyFamily
 from mitoage.taxonomy.utils import BaseCompositionParser, \
     create_dict_advanced_parser, CodonUsageParser
+
+
+class StatsCacheAdmin(ModelAdmin):
+    readonly_fields = ['group_type', 'taxon_id', 'group_size', 'group_section', 'stats_dump']
+    list_display = ('__unicode__', 'class_link', 'group_size', 'group_section', )
+
+    def has_add_permission(self, request):
+        return False
+
+    ########## Additional functions with info for the general panel ###############
+    def class_link(self, obj):
+        tax = None
+        if obj.group_type==1:
+            return "Scope: all species"
+        elif obj.group_type==2:
+            try:
+                tax = TaxonomyClass.objects.get(id=obj.taxon_id)
+            except TaxonomyClass.DoesNotExist:
+                return "(Class not found)"
+        elif obj.group_type==3:
+            try:
+                tax = TaxonomyOrder.objects.get(id=obj.taxon_id)
+            except TaxonomyOrder.DoesNotExist:
+                return "(Order not found)"
+        elif obj.group_type==4:
+            try:
+                tax = TaxonomyFamily.objects.get(id=obj.taxon_id)
+            except TaxonomyFamily.DoesNotExist:
+                return "(Family not found)"
+        else:
+            return "Scope: custom"
+        return u'Scope: <a href="%s">%s %s (ID:%s)</a>' % (tax.get_absolute_admin_url(), obj.TAXON_DICT[obj.group_type], tax.name, tax.pk) 
+    class_link.short_description = "Taxonomy"
+    class_link.allow_tags = True
+
 
 
 class MitoAgeCodonUsageInline(admin.StackedInline):
@@ -484,3 +520,4 @@ class MitoAgeEntryAdmin(ModelAdmin):
 ################################### Register all admin classes ###################################
 #admin.site.register(BaseComposition, BaseCompositionAdmin)
 admin.site.register(MitoAgeEntry, MitoAgeEntryAdmin)
+admin.site.register(StatsCache, StatsCacheAdmin)
