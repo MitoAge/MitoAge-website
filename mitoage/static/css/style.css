@@ -83,5 +83,20 @@
 
 .aa-icon {
 	width: 120px;
+	margin: 10px;
+	font-size: 75%;
+	font-weight: bold;
+	float: left;
 }
 
+.aa-text {
+	margin: 0px;
+	padding: 0px;
+	text-align: center;
+}
+
+.aa-panel {
+	margin: 0px;
+	padding: 0px;
+	margin-top: -100px;
+}
