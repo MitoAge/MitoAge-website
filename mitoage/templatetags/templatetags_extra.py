@@ -7,7 +7,7 @@ register = template.Library()
 
 @register.filter
 def field_in_dictionary(row, key):
-    return row.get(key, '')
+    return row.get(key, '0')
 
 
 @register.filter
@@ -38,3 +38,8 @@ def codon_usage_nice_title(key):
 @register.filter
 def pluralize_taxonomy(key):
     return {'species':'species', 'family':'families', 'order':'orders', 'class':'classes'}.get(key, key)
+
+@register.filter
+def get_aa_url(symbol):
+    return "images/aa_icons/%s.png" % symbol
+

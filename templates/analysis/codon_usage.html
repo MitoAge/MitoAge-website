@@ -46,14 +46,18 @@
 			</td>
 		</tr>
 		<tr>
-			<td colspan="16" style="word-break:break-all;"><b>Amino acid frequencies:</b> 
-				
+			<td colspan="16" style="word-break:break-all;"><b>Amino acid frequencies:<br/></b> 
+				<div class="row">
 				{% with frequecies=codon_usage.get_aa_frequencies %}
 					{% for aa in codon_usage.get_amino_acids %}
-						{{ aa.name }} ({{ aa.symbol }}, {{ aa.letter}}) - 
-	    				{{ frequecies|field_in_dictionary:aa.letter }}
+						<div class="col-md-2 column">
+		    				{{ frequecies|field_in_dictionary:aa.letter }} x 
+							<img class="aa-icon" src="{% static aa.symbol|get_aa_url %}">
+							
+		    			</div>
 	    			{% endfor %}
 				{% endwith %}
+				</div>
 			</td>
 		</tr>
 		<tr>
