@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django import template
 
 from mitoage.analysis.models import BaseComposition, CodonUsage, MitoAgeEntry
@@ -16,7 +18,10 @@ def per_1kb(value, size):
 
 @register.simple_tag
 def percent(value, size, digits):
-    return round(value*100.0/size, digits) if value and size else None
+    value = Decimal(value)
+    if not value:
+        return 0
+    return round(value*100/size, digits) if value and size else None
 
 
 @register.filter

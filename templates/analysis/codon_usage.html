@@ -48,21 +48,20 @@
 		<tr>
 			<td colspan="16"><b>Amino acid frequencies:<br/></b> 
 				<div class="aa-panel">
-				{% with frequecies=codon_usage.get_aa_frequencies %}
 					{% for aa in codon_usage.get_amino_acids %}
 						<div class="aa-icon">
 							<div>
-			    				{% comment %}{{ frequecies|field_in_dictionary:aa.letter }} x {% endcomment %} 
 								<img class="aa-icon" src="{% static aa.symbol|get_aa_url %}">
 							</div>
 							<div class="aa-text">
 								{{aa.name}} ({{aa.symbol}}, {{aa.letter}})<br/>
-								n = {{ frequecies|field_in_dictionary:aa.letter }}  
+								{% with n=codon_usage.get_aa_frequencies|field_in_dictionary:aa.letter %}
+								n = {{ n }} ({% percent n codon_usage.aa|length|add:-1 2 %}%)
+								{% endwith %}
 							</div>
 		    			</div>
 					
 	    			{% endfor %}
-				{% endwith %}
 				</div>
 			</td>
 		</tr>
