@@ -1,0 +1,3 @@
+{% load templatetags_extra %}Species, GC (%), AT (%), G (bases), C (bases), A (bases), T (bases), Maximum lifespan (yrs)
+{% for row in data %}{{row.0.name}}, {% with row.0|get_base_composition:row.1 as c %}{% percent c.gc c.size 1 %}, {% percent c.at c.size 1 %}, {{c.g| stringformat:'d'}}, {{c.c| stringformat:'d'}}, {{c.a| stringformat:'d'}}, {{c.t| stringformat:'d'}}, {{row.0.lifespan| stringformat:'.1f'}},
+{% endwith %}{% endfor %}

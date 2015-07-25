@@ -1,6 +1,7 @@
 import collections
 import time
 
+from django.core import urlresolvers
 from django.db import connection
 from django.db import models
 from django.db.models.aggregates import Avg, Max, Min, StdDev
@@ -35,7 +36,7 @@ class StatsCache(models.Model):
     
     def dump_stats(self, group_type, taxon_id, section, stats):
         (self.group_section, self.group_size, self.group_type, self.taxon_id) = (section, stats.group_size, group_type, taxon_id)
-        self.stats_dump = simplejson.dumps([stats.min, stats.max, stats.mean, stats.stdev, stats.median, stats.coef_var], use_decimal=True)
+        self.stats_dump = simplejson.dumps([stats.min, stats.max, stats.mean, stats.stdev, stats.median, stats.coef_var, stats.pearson], use_decimal=True)
 
     def get_group_name(self):
         if self.group_type==1:
@@ -62,17 +63,30 @@ class StatsCache(models.Model):
 
 
 class BaseCompositionStats():
+    
+    @staticmethod
+    def get_export_table_url(section, taxon_object, taxon_type):
+        if taxon_type != "Custom":
+            if not taxon_object:
+                return urlresolvers.reverse("export-table", args=(section,))
+            else: 
+                return urlresolvers.reverse("export-table", args=(section, taxon_object.pk, taxon_type))
+        return ""
+    
     def __init__(self, species, section, taxon_type="Custom", taxon_object=None):
         self.section = section
         start = time.time()
-        
+
+        self.url_to_export = BaseCompositionStats.get_export_table_url(section, taxon_object, taxon_type)
+
         if taxon_type!="Custom" and species.count()>5:
             group_type = {"":1, "class":2, "order":3, "family":4}[taxon_type] if taxon_type else 1
             taxon_id = taxon_object.pk if taxon_object else 0
+
             try:
                 cache = StatsCache.objects.get(group_type=group_type, taxon_id=taxon_id, group_section=section)
                 self.group_size = cache.group_size
-                self.min, self.max, self.mean, self.stdev, self.median, self.coef_var = simplejson.loads(cache.stats_dump) 
+                self.min, self.max, self.mean, self.stdev, self.median, self.coef_var, self.pearson = simplejson.loads(cache.stats_dump) 
                 
             except StatsCache.DoesNotExist:
                 # no cache found, computing and saving
@@ -83,6 +97,7 @@ class BaseCompositionStats():
             except StatsCache.MultipleObjectsReturned:
                 # what to do if multiple caches have been returned?
                 pass
+            #self.compute_stats2(species, section)
         else:
             self.compute_stats2(species, section)
             
@@ -97,7 +112,7 @@ class BaseCompositionStats():
                                'nd4':'nd4', 'nd4l':'nd4l', 'nd5':'nd5', 'nd6':'nd6', 'rRNA_12S':'rRNA_12S', 'rRNA_16S':'rRNA_16S'}.get(section, 'total_mtDNA')
         section_prefix = "bc_%s_" % section_translation
 
-        self.min, self.max, self.mean, self.stdev, self.median, self.coef_var = ({}, {}, {}, {}, {}, {})
+        self.min, self.max, self.mean, self.stdev, self.median, self.coef_var, self.pearson = ({}, {}, {}, {}, {}, {}, {})
 
         kwargs1 = { ('%ssize__isnull' % section_prefix): 'True', }
         kwargs2 = { ('%ssize__exact' % section_prefix): '0', }
@@ -108,25 +123,42 @@ class BaseCompositionStats():
             self.compositions = [ (x.species, x.get_base_composition(section)) for x in mitoage_entries ]
             return 
 
-        self.compute_stats_for("g", section_prefix, mitoage_entries) 
-        self.compute_stats_for("c", section_prefix, mitoage_entries) 
-        self.compute_stats_for("a", section_prefix, mitoage_entries) 
-        self.compute_stats_for("t", section_prefix, mitoage_entries) 
-        self.compute_stats_for("lifespan", "species__", mitoage_entries)
-        
         cursor = connection.cursor()
         fake_query = str(mitoage_entries.annotate(x=Min("%sg" % section_prefix)).query)
         from_query = fake_query[fake_query.find('FROM'):fake_query.find('GROUP BY')]
 
+        fake_query = str(mitoage_entries.annotate(x=Min("species__lifespan")).query)
+        joined_from_query = fake_query[fake_query.find('FROM'):fake_query.find('GROUP BY')]
+
+        self.compute_stats_for("g", section_prefix, mitoage_entries, cursor, joined_from_query) 
+        self.compute_stats_for("c", section_prefix, mitoage_entries, cursor, joined_from_query) 
+        self.compute_stats_for("a", section_prefix, mitoage_entries, cursor, joined_from_query) 
+        self.compute_stats_for("t", section_prefix, mitoage_entries, cursor, joined_from_query) 
+        self.compute_stats_for("lifespan", "species__", mitoage_entries)
+
         self.additional_column = '(("analysis_mitoageentry"."%sg" + "analysis_mitoageentry"."%sc")*100.0/"analysis_mitoageentry"."%ssize")' % (section_prefix, section_prefix, section_prefix)
-        self.compute_stats_through_direct_queries(cursor, "gc", from_query, self.additional_column)
+        self.compute_stats_through_direct_queries(cursor, "gc", from_query, self.additional_column, joined_from_query)
         
         self.additional_column = '(("analysis_mitoageentry"."%sa" + "analysis_mitoageentry"."%st")*100.0/"analysis_mitoageentry"."%ssize")' % (section_prefix, section_prefix, section_prefix)
-        self.compute_stats_through_direct_queries(cursor, "at", from_query, self.additional_column)
+        self.compute_stats_through_direct_queries(cursor, "at", from_query, self.additional_column, joined_from_query)
 
-
-
-    def compute_stats_through_direct_queries(self, cursor, field_name, from_query, column):
+    def compute_stats_for(self, field_name, section_prefix, entries, cursor=None, joined_from_query=None):
+        full_field_name = section_prefix + field_name
+        results = entries.aggregate(average_value = Avg(full_field_name), stdev_value = StdDev(full_field_name), max_value = Max(full_field_name), min_value = Min(full_field_name))
+        self.min[field_name] = results['min_value']
+        self.max[field_name] = results['max_value']
+        self.mean[field_name] = results['average_value']
+        self.stdev[field_name] = results['stdev_value']
+        self.median[field_name] = median_value(entries,full_field_name)
+        self.compute_coef_of_variance(field_name)
+        
+        if cursor:
+            column_name = '("analysis_mitoageentry"."%s%s")' % (section_prefix, field_name)
+            cursor.execute('SELECT corr(%s, log("taxonomy_taxonomyspecies"."lifespan") ) %s' % (column_name, joined_from_query))
+            self.pearson[field_name] = cursor.fetchone()[0]
+        
+    
+    def compute_stats_through_direct_queries(self, cursor, field_name, from_query, column, joined_from_query):
         cursor.execute('SELECT min%s %s' % (column, from_query) )
         self.min[field_name] = cursor.fetchone()[0]
         cursor.execute('SELECT max%s %s' % (column, from_query) )
@@ -135,10 +167,11 @@ class BaseCompositionStats():
         self.mean[field_name] = cursor.fetchone()[0]
         cursor.execute('SELECT stddev%s %s' % (column, from_query) )
         self.stdev[field_name] = cursor.fetchone()[0]
+        cursor.execute('SELECT corr(%s, log("taxonomy_taxonomyspecies"."lifespan") ) %s' % (column, joined_from_query))
+        self.pearson[field_name] = cursor.fetchone()[0]
 
         self.median[field_name] = self.compute_median_with_direct_queries(cursor, from_query, column)[0]
         self.compute_coef_of_variance(field_name)
-
     
     def compute_median_with_direct_queries(self, cursor, from_query, column):
         cursor.execute('SELECT count%s %s' % (column, from_query) )
@@ -154,22 +187,10 @@ class BaseCompositionStats():
             self.coef_var[field_name] = self.stdev[field_name] / self.mean[field_name]
         else:
             self.coef_var[field_name] = None
-
-    
-    def compute_stats_for(self, field_name, section_prefix, entries):
-        full_field_name = section_prefix + field_name
-        results = entries.aggregate(average_value = Avg(full_field_name), stdev_value = StdDev(full_field_name), max_value = Max(full_field_name), min_value = Min(full_field_name))
-        self.min[field_name] = results['min_value']
-        self.max[field_name] = results['max_value']
-        self.mean[field_name] = results['average_value']
-        self.stdev[field_name] = results['stdev_value']
-        self.median[field_name] = median_value(entries,full_field_name)
-        self.compute_coef_of_variance(field_name)
-    
     
     def to_string(self):
         return "n:%s, min:%s, max:%s, mean:%s, stdev:%s, median:%s" % (self.group_size, self.min, self.max, self.mean, self.stdev, self.median)
-        
+
 
 class BaseComposition():
     def __init__(self, size, g, c, a, t, others):
@@ -230,6 +251,12 @@ class BaseComposition():
             'rRNA_16S': "16S rRNA gene",
         }.get(key, "No title")
 
+    @staticmethod
+    def total_title_lower(value):
+        new_value = value
+        if value.startswith("T"):
+            new_value = "t%s" % value[1:]
+        return new_value
 
 
 class AminoAcid():

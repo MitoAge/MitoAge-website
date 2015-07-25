@@ -8,7 +8,9 @@
 
 {% block content_description %} 
 	<p>Class <b>{{ taxonomy_class.name }}</b> contains {{paginator.count}} orders spanning {{taxonomy_class.number_of_species}} species (in the brackets are the number of species in the order).
-	You can either use the links below to browse through the orders, or you may <a class="btn btn-xs btn-primary" href="{% url 'stats' taxonomy_class.pk 'class' %}">view stats for the entire class</a>
+	You can either use the links below to browse through the orders, 
+	<a class="btn btn-xs btn-primary" href="{% url 'export-table' 'total_mtDNA' taxonomy_class.pk 'class' %}">view all species ({{taxonomy_class.number_of_species}})</a> 
+	or you may <a class="btn btn-xs btn-primary" href="{% url 'stats' taxonomy_class.pk 'class' %}">view <u>stats</u> for the entire class ({{taxonomy_class.number_of_species}})</a>
 {% endblock %}
 
 {% block browsing_content %}

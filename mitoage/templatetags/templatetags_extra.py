@@ -1,6 +1,6 @@
 from django import template
 
-from mitoage.analysis.models import BaseComposition, CodonUsage
+from mitoage.analysis.models import BaseComposition, CodonUsage, MitoAgeEntry
 
 
 register = template.Library()
@@ -21,10 +21,7 @@ def percent(value, size, digits):
 
 @register.filter
 def total_lower(value):
-    new_value = value
-    if value.startswith("T"):
-        new_value = "t%s" % value[1:]
-    return new_value
+    return BaseComposition.total_title_lower(value)
 
 @register.filter
 def base_composition_nice_title(key):
@@ -43,3 +40,16 @@ def pluralize_taxonomy(key):
 def get_aa_url(symbol):
     return "images/aa_icons/%s.png" % symbol
 
+
+@register.filter
+def get_base_composition(species, section):
+    if not species:
+        return None
+    try:
+        mitoage_entry = species.mitoage_entries.first()
+        if mitoage_entry:
+            return mitoage_entry.get_base_composition(section)
+    except MitoAgeEntry.DoesNotExist:
+        pass
+    return None
+    

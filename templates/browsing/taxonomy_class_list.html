@@ -8,7 +8,8 @@
 
 {% block content_description %} 
 	<p>In total, our database contains information about {{paginator.count}} classes, spanning {{number_of_species}} species (in the brackets are the number of species in the class).
-	You can either use the links below to browse through the classes, or you may <a class="btn btn-xs btn-primary" href="{% url 'stats' %}">view stats for all the species</a>
+	You can either use the links below to browse through the classes, <a class="btn btn-xs btn-primary" href="{% url 'export-table' 'total_mtDNA' %}">view all species ({{number_of_species}})</a>
+	or you may <a class="btn btn-xs btn-primary" href="{% url 'stats' %}">view <u>stats</u> for all the species ({{number_of_species}})</a>
 {% endblock %}
 
 

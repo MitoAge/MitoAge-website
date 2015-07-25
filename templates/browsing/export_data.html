@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+{% load templatetags_extra %}
+{% load bootstrap_pagination %}
+
+{% block subtitle %} | Export data {% endblock%}
+
+{% block content %}
+
+	<div class="container">
+		<h1>{{ title|safe }}</h1>
+
+		<div class="row">
+			<div class="col-md-10">
+				<div class="row">
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Species (N={{no_of_species}})</b></td>
+								<th class="text-center">GC (%)</th>
+								<th class="text-center">AT (%)</th>
+								<th class="text-center">G (bases)</th>
+								<th class="text-center">C (bases)</th>
+								<th class="text-center">A (bases)</th>
+								<th class="text-center">T (bases)</th>
+								<th class="text-center">Maximum lifespan (yrs)</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for species in object_list %}
+							{% with species|get_base_composition:section as c %}
+							<tr>
+								<td><a href="{{species.get_viewing_url}}">{{species.name}}</a></td>
+								<td class="text-center">{% percent c.gc c.size 1 %}</td>
+								<td class="text-center">{% percent c.at c.size 1 %}</td>
+								<td class="text-center">{{c.g| stringformat:'d'}}</td>
+								<td class="text-center">{{c.c| stringformat:'d'}}</td>
+								<td class="text-center">{{c.a| stringformat:'d'}}</td>
+								<td class="text-center">{{c.t| stringformat:'d'}}</td>
+								<td class="text-center">{{species.lifespan| stringformat:'.1f'}}</td>
+							</tr>
+							{% endwith %}
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				{% if is_paginated %}
+					{% bootstrap_paginate page_obj range=5 show_prev_next="true" show_first_last="true" previous_label="<" next_label=">" first_label="<<" last_label=">>"%}
+				{% endif %}
+			</div>
+			<div class="col-md-2">
+				<div class="export-button">
+					{% if object %} 
+						<a class="btn btn-sm btn-success export-button" href="{% url 'export-table' section 'csv' object.pk taxon %}">Export data</a>
+					{% else %}
+						<a class="btn btn-sm btn-success export-button" href="{% url 'export-table' section 'csv' %}">Export data</a>
+					{% endif %}
+				</div>
+				<div class="export-panel smaller-font">
+					<h5><u>Other sections:</u></h5>
+					{% for section in other_sections %}
+						{% if object %} 
+							<a href="{% url 'export-table' section object.pk taxon %}">{{ section|base_composition_nice_title }}</a><br/>
+						{% else %}
+							<a href="{% url 'export-table' section %}">{{ section|base_composition_nice_title }}</a><br/>
+						{% endif %}
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock%}
+

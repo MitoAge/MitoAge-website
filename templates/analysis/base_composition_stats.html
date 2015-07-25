@@ -6,9 +6,11 @@
 	{% comment %}
 	Results: [{{ stats.results }}]<br/>
 	Query: [{{ stats.query }}]<br/>
-	(time: {{stats.elapsed_time}}) 
-	Test: [{{ stats.test }}]<br/>
+	(time: {{stats.elapsed_time}})<br/> 
+	Test: [{{ stats.test|safe }}]<br/>
 	{% endcomment %}
+
+<div class="link-to-table-data"><a href="{{ stats.url_to_export }}">Export table data</a></div>
 <table class="table">
 	<thead>
 		<tr>
@@ -93,6 +95,16 @@
 			<td class="text-center">{% if stats.coef_var.a %}{{stats.coef_var.a| stringformat:'.2f'}}{% endif %}</td>
 			<td class="text-center">{% if stats.coef_var.t %}{{stats.coef_var.t| stringformat:'.2f'}}{% endif %}</td>
 			<td class="text-center">{% if stats.coef_var.lifespan %}{{stats.coef_var.lifespan| stringformat:'.2f'}}{% endif %}</td>
+		</tr>
+		<tr>
+			<td>Pearson (X, log<sub>10</sub>(lifespan))</td>	
+			<td class="text-center">{% if stats.pearson.gc %}{{stats.pearson.gc| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.pearson.at %}{{stats.pearson.at| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.pearson.g %}{{stats.pearson.g| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.pearson.c %}{{stats.pearson.c| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.pearson.a %}{{stats.pearson.a| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.pearson.t %}{{stats.pearson.t| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center"> - </td>
 		</tr>
 		{% endif %}
 	</tbody>

@@ -7,6 +7,7 @@
 {% block subtitle %} | Stats for species {% endblock%}
 
 {% block content %}
+
 	<div class="container">
 		<h1>{{ title|safe }}</h1>
 
@@ -44,9 +45,25 @@
 						{% endif %}
 					{% endfor %}
 				</div>
-					{% if is_paginated %}
-						{% bootstrap_paginate page_obj range=2 show_prev_next="true" show_first_last="false" previous_label="<" next_label=">" first_label="<<" last_label=">>"%}
+				{% if is_paginated %}
+					{% bootstrap_paginate page_obj range=2 show_prev_next="true" show_first_last="false" previous_label="<" next_label=">" first_label="<<" last_label=">>"%}
+				{% endif %}
+
+				{% if subtaxon != 'species' %}
+				<div class="row">
+				<hr/>
+					<h5><b>Species in group ({{species|length}}):</b></h5>
+					{% for sp in species|slice:":10" %}
+						<a href="{% url 'view_species' sp.pk %}">{{ sp.name }}</a> <br/>
+					{% endfor %}
+					
+					{% if species|length > 10 %}
+						...
+						<br/><a href="{{ taxonomy_url }}">View all species</a><br/>
 					{% endif %}
+				</div>
+				{% endif %}
+				
 			</div>
 			
 			<div class="col-md-10">
