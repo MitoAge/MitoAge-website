@@ -2,7 +2,7 @@ from django.db import connection
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 
-from mitoage.analysis.models import MitoAgeEntry
+from mitoage.analysis.models import MitoAgeEntry, BaseCompositionStats
 from mitoage.taxonomy.models import TaxonomySpecies, TaxonomyFamily, \
     TaxonomyOrder, TaxonomyClass
 
@@ -35,3 +35,25 @@ def statistics(request):
     min_at_species = max_gc_species
     
     return render_to_response('analysis/statistics.html', locals(), RequestContext(request))
+
+def compare(request):
+    compared_stats = request.session.get('compared_stats', [])
+    compared_stats = BaseCompositionStats.get_cached_objects(compared_stats)
+    return render_to_response('analysis/compare.html', locals(), RequestContext(request))
+
+def add_to_compare_cart(request, pk):
+    compared_stats = request.session.get('compared_stats', [])
+    if pk not in compared_stats:
+        compared_stats.append(pk)
+        request.session['compared_stats'] = compared_stats
+    
+    from django.http import JsonResponse
+    return JsonResponse({'no_compared_stats':len(request.session['compared_stats'])})
+
+def delete_from_compare_cart(request, pk):
+    compared_stats = request.session.get('compared_stats', [])
+    if pk in compared_stats:
+        compared_stats.remove(pk)
+        request.session['compared_stats'] = compared_stats
+    compared_stats = BaseCompositionStats.get_cached_objects(compared_stats)
+    return render_to_response('analysis/compare.html', locals(), RequestContext(request))

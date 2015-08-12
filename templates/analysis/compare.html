@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% load templatetags_extra %}
+
+{% block subtitle %} | Compare stats {% endblock%}
+
+{% block content %}
+	<div class="container">
+		<h1>Stats comparison</h1>
+		<br/>
+
+	{% if compared_stats %}
+		{% for stats in compared_stats %}
+		
+			<div class="panel panel-default base-composition-panel-body">
+				<div class="panel-body">
+					<div class="row">
+						<div class="col-md-12">
+
+							<div class="link-to-table-data">
+								<a href="{% url 'delete_from_compare_cart' stats.cache_pk %}"><span class="glyphicon glyphicon-minus"></span>&nbsp;Remove from comparison</a>
+							</div>
+			
+							<table class="table">
+								<thead>
+									<tr>
+										<th colspan="8" class="text-center">
+											Stats for {{stats.section|base_composition_nice_title|total_lower}} in {% if stats.group_type %} {{stats.group_type}} {% endif %}{{stats.taxon}} (group size: {{stats.group_size}} species)
+										</th>
+									</tr>
+								</thead>
+				
+								{% include "analysis/_base_composition_stats_table.html" %}
+								
+							</table>
+							</div>
+						</div>
+					</div>
+				</div>
+
+		{% endfor %}
+	{% else %}
+			Your "Compare basket" is empty. Add stats to it (by browsing) in order to compare them. <br/><br/>
+			<a href="{% url 'stats' %}">Browse through stats</a>
+	{% endif %}
+	
+	</div>
+{% endblock %}

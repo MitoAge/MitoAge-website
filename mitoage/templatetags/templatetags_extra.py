@@ -57,4 +57,10 @@ def get_base_composition(species, section):
     except MitoAgeEntry.DoesNotExist:
         pass
     return None
-    
+
+@register.simple_tag(takes_context=True)
+def is_in_cart(context, pk):
+    #request = context['request']
+    #compared_stats = request.session.get('compared_stats', [])
+    #return pk in compared_stats
+    return True

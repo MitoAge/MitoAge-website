@@ -1,5 +1,7 @@
 {% load staticfiles %}
 
+{% load templatetags_extra %}
+
 <ul class="nav navbar-nav green_flame">
 	<li>
 		<a href="{% url 'home' %}"><span class="glyphicon glyphicon-home"></span> Home</a>
@@ -21,6 +23,10 @@
 				<a href="{% url 'stats' %}">Stats</a>
 			</li>
 		</ul>
+	</li>
+
+	<li>
+		<a href="{% url 'compare' %}"><span class="glyphicon glyphicon-th-list"></span> Compare stats (<span id="number-of-items-in-cart">{{request.session.compared_stats|length}}</span>)</a>
 	</li>
 
 </ul>

@@ -73,34 +73,53 @@ class BaseCompositionStats():
                 return urlresolvers.reverse("export-table", args=(section, taxon_object.pk, taxon_type))
         return ""
     
-    def __init__(self, species, section, taxon_type="Custom", taxon_object=None):
-        self.section = section
+    @staticmethod
+    def get_cached_objects(compared_stats):
+        caches = StatsCache.objects.filter(pk__in=compared_stats)
+        results = []
+        for cache in caches:
+            results.append(BaseCompositionStats(None, None, None, None, cache))
+        return results
+    
+    def __init__(self, species, section, taxon_type="Custom", taxon_object=None, cache=None):
         start = time.time()
-
-        self.url_to_export = BaseCompositionStats.get_export_table_url(section, taxon_object, taxon_type)
-
-        if taxon_type!="Custom" and species.count()>5:
-            group_type = {"":1, "class":2, "order":3, "family":4}[taxon_type] if taxon_type else 1
-            taxon_id = taxon_object.pk if taxon_object else 0
-
-            try:
-                cache = StatsCache.objects.get(group_type=group_type, taxon_id=taxon_id, group_section=section)
-                self.group_size = cache.group_size
-                self.min, self.max, self.mean, self.stdev, self.median, self.coef_var, self.pearson = simplejson.loads(cache.stats_dump) 
-                
-            except StatsCache.DoesNotExist:
-                # no cache found, computing and saving
-                self.compute_stats2(species, section)
-                cache = StatsCache()
-                cache.dump_stats(group_type, taxon_id, section, self)
-                cache.save()
-            except StatsCache.MultipleObjectsReturned:
-                # what to do if multiple caches have been returned?
-                pass
-            #self.compute_stats2(species, section)
+        if cache:
+            self.group_size = cache.group_size
+            self.min, self.max, self.mean, self.stdev, self.median, self.coef_var, self.pearson = simplejson.loads(cache.stats_dump)
+            self.url_to_compare = urlresolvers.reverse("add_to_compare_cart", args=(cache.pk,))
+            self.cache_pk = cache.pk 
+            self.section = cache.group_section
+            self.group_type= {1:"", 2:"class", 3:"order", 4:"family"}[cache.group_type] if cache.group_type else None
+            self.taxon=cache.get_group_name() 
         else:
-            self.compute_stats2(species, section)
-            
+            self.section = section
+    
+            self.url_to_export = BaseCompositionStats.get_export_table_url(section, taxon_object, taxon_type)
+    
+            if taxon_type!="Custom" and species.count()>5:
+                group_type = {"":1, "class":2, "order":3, "family":4}[taxon_type] if taxon_type else 1
+                taxon_id = taxon_object.pk if taxon_object else 0
+    
+                try:
+                    cache = StatsCache.objects.get(group_type=group_type, taxon_id=taxon_id, group_section=section)
+                    self.group_size = cache.group_size
+                    self.min, self.max, self.mean, self.stdev, self.median, self.coef_var, self.pearson = simplejson.loads(cache.stats_dump)
+                    self.url_to_compare = urlresolvers.reverse("add_to_compare_cart", args=(cache.pk,))
+                    
+                except StatsCache.DoesNotExist:
+                    # no cache found, computing and saving
+                    self.compute_stats2(species, section)
+                    cache = StatsCache()
+                    cache.dump_stats(group_type, taxon_id, section, self)
+                    cache.save()
+                    self.url_to_compare = urlresolvers.reverse("add_to_compare_cart", args=(cache.pk,))
+                except StatsCache.MultipleObjectsReturned:
+                    # what to do if multiple caches have been returned?
+                    pass
+                #self.compute_stats2(species, section)
+            else:
+                self.compute_stats2(species, section)
+             
         end = time.time()
         self.elapsed_time = end - start        
 
@@ -190,6 +209,7 @@ class BaseCompositionStats():
     
     def to_string(self):
         return "n:%s, min:%s, max:%s, mean:%s, stdev:%s, median:%s" % (self.group_size, self.min, self.max, self.mean, self.stdev, self.median)
+
 
 
 class BaseComposition():

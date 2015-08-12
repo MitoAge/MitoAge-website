@@ -1,0 +1,98 @@
+{% load staticfiles %}
+
+{% load templatetags_extra %}
+
+{% if stats %}
+
+	<tbody>
+		{% if stats.group_size = 0 %}
+		<tr>
+			<td colspan=8> There is no data for {{stats.section|base_composition_nice_title|total_lower}} in this group. </td>
+		</tr>
+		{% elif stats.group_size <= 5 %}
+			<tr>
+				<td><b>Species</b></td>
+				<td class="text-center"><b>GC (%)</b></td>
+				<td class="text-center"><b>AT (%)</b></td>
+				<td class="text-center"><b>G (bases)</b></td>
+				<td class="text-center"><b>C (bases)</b></td>
+				<td class="text-center"><b>A (bases)</b></td>
+				<td class="text-center"><b>T (bases)</b></td>
+				<td class="text-center"><b>Maximum lifespan (yrs)</b></td>
+			</tr>
+			{% for c in stats.compositions %}
+			<tr>
+				<td>{{c.0.name}}</td>
+				<td class="text-center">{% percent c.1.gc c.1.size 1 %}</td>
+				<td class="text-center">{% percent c.1.at c.1.size 1 %}</td>
+				<td class="text-center">{{c.1.g| stringformat:'d'}}</td>
+				<td class="text-center">{{c.1.c| stringformat:'d'}}</td>
+				<td class="text-center">{{c.1.a| stringformat:'d'}}</td>
+				<td class="text-center">{{c.1.t| stringformat:'d'}}</td>
+				<td class="text-center">{{c.0.lifespan| stringformat:'.1f'}}</td>
+			</tr>
+			{% endfor %}
+		{% else %}
+		<tr>
+			<td> </td>
+			<td class="text-center">GC (%)</td>
+			<td class="text-center">AT (%)</td>
+			<td class="text-center">G (bases)</td>
+			<td class="text-center">C (bases)</td>
+			<td class="text-center">A (bases)</td>
+			<td class="text-center">T (bases)</td>
+			<td class="text-center">Maximum lifespan (yrs)</td>
+		</tr>
+		<tr>
+			<td>Range (min-max)</td>
+			<td class="text-center">{% if stats.min.gc %}{{stats.min.gc| stringformat:'.1f'}} - {{stats.max.gc| stringformat:'.1f'}}%{% endif %}</td>
+			<td class="text-center">{% if stats.min.at %}{{stats.min.at| stringformat:'.1f'}} - {{stats.max.at| stringformat:'.1f'}}%{% endif %}</td>
+			<td class="text-center">{% if stats.min.g %}{{stats.min.g| stringformat:'d'}} - {{stats.max.g| stringformat:'d'}}{% endif %}</td>
+			<td class="text-center">{% if stats.min.c %}{{stats.min.c| stringformat:'d'}} - {{stats.max.c| stringformat:'d'}}{% endif %}</td>
+			<td class="text-center">{% if stats.min.a %}{{stats.min.a| stringformat:'d'}} - {{stats.max.a| stringformat:'d'}}{% endif %}</td>
+			<td class="text-center">{% if stats.min.t %}{{stats.min.t| stringformat:'d'}} - {{stats.max.t| stringformat:'d'}}{% endif %}</td>
+			<td class="text-center">{% if stats.min.lifespan %}{{stats.min.lifespan| stringformat:'.1f'}} - {{stats.max.lifespan| stringformat:'.1f'}}{% endif %}</td>
+		</tr>
+		<tr>
+			<td>Median</td>
+			<td class="text-center">{% if stats.max.gc %}{{stats.median.gc| stringformat:'.1f'}}%{% endif %}</td>
+			<td class="text-center">{% if stats.max.at %}{{stats.median.at| stringformat:'.1f'}}%{% endif %}</td>
+			<td class="text-center">{% if stats.max.g %}{{stats.median.g| stringformat:'d'}}{% endif %}</td>
+			<td class="text-center">{% if stats.max.c %}{{stats.median.c| stringformat:'d'}}{% endif %}</td>
+			<td class="text-center">{% if stats.max.a %}{{stats.median.a| stringformat:'d'}}{% endif %}</td>
+			<td class="text-center">{% if stats.max.t %}{{stats.median.t| stringformat:'d'}}{% endif %}</td>
+			<td class="text-center">{% if stats.max.lifespan %}{{stats.median.lifespan| stringformat:'.1f'}}{% endif %}</td>
+		</tr>
+		<tr>
+			<td>Average &plusmn; stdev</td>
+			<td class="text-center">{% if stats.mean.gc %}{{stats.mean.gc| stringformat:'.1f'}} &plusmn; {{stats.stdev.gc| stringformat:'.1f'}}%{% endif %}</td>
+			<td class="text-center">{% if stats.mean.at %}{{stats.mean.at| stringformat:'.1f'}} &plusmn; {{stats.stdev.at| stringformat:'.1f'}}%{% endif %}</td>
+			<td class="text-center">{% if stats.mean.g %}{{stats.mean.g| stringformat:'d'}} &plusmn; {{stats.stdev.g| stringformat:'d'}}{% endif %}</td>
+			<td class="text-center">{% if stats.mean.c %}{{stats.mean.c| stringformat:'d'}} &plusmn; {{stats.stdev.c| stringformat:'d'}}{% endif %}</td>
+			<td class="text-center">{% if stats.mean.a %}{{stats.mean.a| stringformat:'d'}} &plusmn; {{stats.stdev.a| stringformat:'d'}}{% endif %}</td>
+			<td class="text-center">{% if stats.mean.t %}{{stats.mean.t| stringformat:'d'}} &plusmn; {{stats.stdev.t| stringformat:'d'}}{% endif %}</td>
+			<td class="text-center">{% if stats.mean.lifespan %}{{stats.mean.lifespan| stringformat:'.1f'}} &plusmn; {{stats.stdev.lifespan| stringformat:'.1f'}}{% endif %}</td>
+		</tr>
+		<tr>
+			<td>Coefficient of variation</td>	
+			<td class="text-center">{% if stats.coef_var.gc %}{{stats.coef_var.gc| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.coef_var.at %}{{stats.coef_var.at| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.coef_var.g %}{{stats.coef_var.g| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.coef_var.c %}{{stats.coef_var.c| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.coef_var.a %}{{stats.coef_var.a| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.coef_var.t %}{{stats.coef_var.t| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.coef_var.lifespan %}{{stats.coef_var.lifespan| stringformat:'.2f'}}{% endif %}</td>
+		</tr>
+		<tr>
+			<td>Pearson correlation coefficient with log10MLS</td>	
+			<td class="text-center">{% if stats.pearson.gc %}{{stats.pearson.gc| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.pearson.at %}{{stats.pearson.at| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.pearson.g %}{{stats.pearson.g| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.pearson.c %}{{stats.pearson.c| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.pearson.a %}{{stats.pearson.a| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center">{% if stats.pearson.t %}{{stats.pearson.t| stringformat:'.2f'}}{% endif %}</td>
+			<td class="text-center"> - </td>
+		</tr>
+		{% endif %}
+	</tbody>
+{% endif %}
