@@ -1,0 +1,11 @@
+{% load staticfiles %}
+
+{% load templatetags_extra %}
+
+{% if pearson_value %}
+	{% with pearson_value|pearson_p_value:group_size as p_value %} 
+		{% if p_value < 0.05 %}<b>{%endif%} 
+			{{ p_value|stringformat:'.2E'}} 
+		{% if p_value < 0.05 %}</b>{%endif%} 
+	{% endwith %} 
+{% endif %}

@@ -93,6 +93,16 @@
 			<td class="text-center">{% if stats.pearson.t %}{{stats.pearson.t| stringformat:'.2f'}}{% endif %}</td>
 			<td class="text-center"> - </td>
 		</tr>
+		<tr>
+			<td>Pearson p-value <br/>(two tailed)</td>	
+			<td class="text-center">{% include "analysis/_p_value.html" with pearson_value=stats.pearson.gc group_size=stats.group_size %}</td>
+			<td class="text-center">{% include "analysis/_p_value.html" with pearson_value=stats.pearson.at group_size=stats.group_size %}</td>
+			<td class="text-center">{% include "analysis/_p_value.html" with pearson_value=stats.pearson.g group_size=stats.group_size %}</td>
+			<td class="text-center">{% include "analysis/_p_value.html" with pearson_value=stats.pearson.c group_size=stats.group_size %}</td>
+			<td class="text-center">{% include "analysis/_p_value.html" with pearson_value=stats.pearson.a group_size=stats.group_size %}</td>
+			<td class="text-center">{% include "analysis/_p_value.html" with pearson_value=stats.pearson.t group_size=stats.group_size %}</td>
+			<td class="text-center"> - </td>
+		</tr>
 		{% endif %}
 	</tbody>
 {% endif %}
