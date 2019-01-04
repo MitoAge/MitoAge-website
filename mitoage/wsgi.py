@@ -7,8 +7,19 @@ For more information on this file, see
 https://docs.djangoproject.com/en/1.7/howto/deployment/wsgi/
 """
 
-import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mitoage.settings")
+import os, sys
 
 from django.core.wsgi import get_wsgi_application
-application = get_wsgi_application()
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mitoage.settings")
+
+
+def application(environ, start_response):
+    # pass the WSGI environment variables on through to os.environ
+    for key in environ:
+        if key.startswith('MYAPP_'):
+            os.environ[key] = environ[key]
+
+    application = get_wsgi_application()
+
+    return application(environ, start_response)
