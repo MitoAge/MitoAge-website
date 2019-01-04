@@ -9,5 +9,5 @@ docutils==0.12
 gunicorn==19.1.1
 numpy==1.9.2
 psycopg2==2.7.1
-scipy==0.15.1
+scipy==1.2.0
 simplejson==3.7.3
