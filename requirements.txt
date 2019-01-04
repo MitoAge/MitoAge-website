@@ -8,7 +8,7 @@ django-suit==0.2.11
 docutils==0.12
 gunicorn==19.1.1
 numpy==1.9.2
-psycopg2==2.5.4
+psycopg2==2.7.1
 scipy==0.15.1
 simplejson==3.7.3
 wsgiref==0.1.2

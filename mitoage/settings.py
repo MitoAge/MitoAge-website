@@ -104,20 +104,30 @@ TEMPLATE_CONTEXT_PROCESSORS = TCP + (
 
 
 
-""" ================= Database ================= """
+# """ ================= Database ================= """
+# DATABASES = {
+#     'default': {
+#         'ENGINE': '', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+#         'NAME': '',                      # Or path to database file if using sqlite3.
+#         # The following settings are not used with sqlite3:
+#         'USER': '',
+#         'PASSWORD': '',
+#         'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+#         'PORT': '',                      # Set to empty string for default.
+#     }
+# }
+# """ !!!Parse database configuration from $DATABASE_URL (settings made with dj-database-url """
+# DATABASES['default'] = dj_database_url.config(default=os.environ['DATABASE_URL'])   # don't forget to set the DATABASE_URL in your
 DATABASES = {
-    'default': {
-        'ENGINE': '', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '',                      # Or path to database file if using sqlite3.
-        # The following settings are not used with sqlite3:
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '',                      # Set to empty string for default.
-    }
+	'default': {
+		'ENGINE': 'django.db.backends.postgresql_psycopg2',
+		'NAME': 'mitoage',
+		'USER': 'mitoage',
+		'PASSWORD': 'strugurel',
+		'HOST': 'localhost',
+		'PORT': '',
+	}
 }
-""" !!!Parse database configuration from $DATABASE_URL (settings made with dj-database-url """
-DATABASES['default'] = dj_database_url.config(default=os.environ['DATABASE_URL'])   # don't forget to set the DATABASE_URL in your
 
 
 
