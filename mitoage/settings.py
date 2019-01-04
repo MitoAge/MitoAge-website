@@ -121,7 +121,7 @@ TEMPLATE_CONTEXT_PROCESSORS = TCP + (
 DATABASES = {
 	'default': {
 		'ENGINE': 'django.db.backends.postgresql_psycopg2',
-		'NAME': 'mitoage',
+        'NAME': os.environ.get('MYAPP_DATABASE_NAME', 'mitoage'),
 		'USER': 'mitoage',
 		'PASSWORD': 'strugurel',
 		'HOST': 'localhost',
