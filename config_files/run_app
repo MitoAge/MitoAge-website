@@ -1,0 +1,16 @@
+#!/usr/bin/with-contenv sh
+
+cd /srv/www
+
+[ -z "$WORKERS" ] && export WORKERS=4
+
+echo -en "\n\nMigrate if needed\n\n"
+./manage.py migrate 
+
+echo -en "\n\nCollect static\n\n"
+./manage.py collectstatic --noinput
+
+export PYTHONPATH=$PATH:/srv/www/mitoage:/usr/lib/python2.7
+
+echo -en "\n\nStarting django\n\n"
+exec gunicorn -w ${WORKERS} -c /srv/www/config_files/gunicorn_conf.py mitoage.wsgi

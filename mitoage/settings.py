@@ -117,17 +117,18 @@ TEMPLATE_CONTEXT_PROCESSORS = TCP + (
 #     }
 # }
 # """ !!!Parse database configuration from $DATABASE_URL (settings made with dj-database-url """
-# DATABASES['default'] = dj_database_url.config(default=os.environ['DATABASE_URL'])   # don't forget to set the DATABASE_URL in your
-DATABASES = {
-	'default': {
-		'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get('MYAPP_DATABASE_NAME', 'mitoage'),
-		'USER': 'mitoage',
-		'PASSWORD': 'strugurel',
-		'HOST': 'localhost',
-		'PORT': '',
-	}
-}
+DATABASES = {}
+DATABASES['default'] = dj_database_url.config(default=os.environ['DATABASE_URL'])   # don't forget to set the DATABASE_URL in your
+# DATABASES = {
+# 	'default': {
+# 		'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': os.environ.get('MYAPP_DATABASE_NAME', 'mitoage'),
+# 		'USER': 'mitoage',
+# 		'PASSWORD': 'strugurel',
+# 		'HOST': 'localhost',
+# 		'PORT': '',
+# 	}
+# }
 
 
 
