@@ -1,4 +1,4 @@
 *.pyc
 static_collected_files/
 media_collected_files/
-
+database_files/
