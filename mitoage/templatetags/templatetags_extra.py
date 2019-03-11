@@ -23,9 +23,9 @@ def pearson_p_value(r, n):
     if abs(r) == 1.0:
         p = 0.0
     else:
-        from scipy.stats.stats import betai
+        from scipy.special import betainc
         t_squared = r*r * (df / ((1.0 - r) * (1.0 + r)))
-        p = betai(0.5*df, 0.5, df / (df + t_squared))
+        p = betainc(0.5*df, 0.5, df / (df + t_squared))
     return p
 
 @register.simple_tag
