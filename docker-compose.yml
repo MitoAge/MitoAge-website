@@ -5,6 +5,7 @@ services:
     image: registry.gitlab.com/sysbio-aging/mitoage:dev
     environment:
       DATABASE_URL: 'postgres://${PGSQL_USER}:${PGSQL_PASS}@${PGSQL_HOST}:${PGSQL_PORT}/${PGSQL_DB}'
+      DEBUG: 'true'
     ports:
       - "0.0.0.0:5000:5000"
     volumes:
