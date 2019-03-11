@@ -30,7 +30,7 @@ SECRET_KEY = 'q1*s(h7_&c*50$4@ek5vr=a#$%*c5!p#(vkz3o#&g9iefh!#6t'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 """ ================= DEBUG mode? ================= """
-DEBUG = True if (os.environ['DEBUG'].lower())=='true' else False
+DEBUG = True if (os.getenv('DEBUG', 'false').lower())=='true' else False
 #DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
