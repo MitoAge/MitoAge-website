@@ -34,7 +34,7 @@ DEBUG = True if (os.getenv('DEBUG', 'false').lower())=='true' else False
 #DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-ALLOWED_HOSTS = ['www.mitoage.org', 'mitoage.org', 'mitoage.info', 'mitoage.herokuapp.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['mitoage.dev.sysbio.atman.ro', 'www.mitoage.org', 'mitoage.org', 'mitoage.info', 'mitoage.herokuapp.com', 'localhost', '127.0.0.1']
 
 ROOT_URLCONF = 'mitoage.urls'
 WSGI_APPLICATION = 'mitoage.wsgi.application'
