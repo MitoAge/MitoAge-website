@@ -11,3 +11,8 @@ build:
   script:
     - docker build -t $IMAGE_TAG .
     - docker push $IMAGE_TAG
+  only:
+      - tags
+      - triggers
+      - schedules
+      - /^(dev|staging)$/
